@@ -19,18 +19,21 @@ all : $(ALL_DIRS) $(HEX_FILE)
 	@echo All done
 
 $(ALL_DIRS) :
-	mkdir -p $@
+	@mkdir -p $@
+	@echo Made directories
 
 $(HEX_FILE) : $(OBJ_FILE)
-	avr-ld --oformat ihex -o $@ $^
+	@avr-ld --oformat ihex -o $@ $^
+	@echo Created $@
 
-$(OBJ_FILE) : $(SOURCE) $(INCLUDES)
-	avr-gcc \
+$(OBJ_FILE) : $(SOURCE) $(INCLUDES) Makefile
+	@avr-gcc \
 	-Xlinker -Tdata -Xlinker 0x800100 \
 	-Xlinker -M -nostdlib \
 	-O2 -B/usr/avr/lib \
 	-I/usr/local/avr/include -Wall \
-	-mmcu=avr4 -D__AVR_ATmega88__ \
+	-mmcu=atmega328 -D__AVR_ATmega328__ \
 	-o $@ $(SOURCE) > $(MAP_FILE)
+	@echo Compiled source
 
 
