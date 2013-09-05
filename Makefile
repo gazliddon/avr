@@ -36,4 +36,5 @@ $(OBJ_FILE) : $(SOURCE) $(INCLUDES) Makefile
 	-o $@ $(SOURCE) > $(MAP_FILE)
 	@echo Compiled source
 
-
+clean:
+	@rm -rf $(BUILD_DIR)
