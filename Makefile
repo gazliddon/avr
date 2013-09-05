@@ -30,9 +30,7 @@ $(OBJ_FILE) : $(SOURCE) $(INCLUDES) Makefile
 	@avr-gcc \
 	-Xlinker -Tdata -Xlinker 0x800100 \
 	-Xlinker -M -nostdlib \
-	-O2 -B/usr/avr/lib \
-	-I/usr/local/avr/include -Wall \
-	-mmcu=atmega328 -D__AVR_ATmega328__ \
+	-Wall -mmcu=atmega328 \
 	-o $@ $(SOURCE) > $(MAP_FILE)
 	@echo Compiled source
 
