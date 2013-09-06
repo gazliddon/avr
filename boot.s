@@ -3,8 +3,9 @@
 		.global	__vectors
 		.global	delayxplus16
 
-__vectors:
-		rjmp	main                    ; Vector for start of projects
+		.section ".vectors"
+
+__vectors: 	rjmp 	main                    ; Vector for start of projects
 
 		; exactly 10 words
 
@@ -23,14 +24,15 @@ delayxplus16:	; 3 + 13 + xoff                 ; Some code to fill in the space :
 
 		rjmp	__vector_11             ;  Vector for Hblank routine
 
+
 main:           ; Poke values from a table into registers
 
 		eor	r1, r1
 
-		ldi	r30, lo8(pokelist)
+1:		ldi	r30, lo8(pokelist)
 		ldi	r31, hi8(pokelist)
 		ldi	r27, 0
-1:
+loop:
 		lpm	r26, Z+         ; Load from Z and post inc into R26
 		tst	r26             ; If it's zero we're done
 		breq	2f
@@ -38,38 +40,19 @@ main:           ; Poke values from a table into registers
 		st	X, r16          ; Store it in the register
 		rjmp	1b              ; Loop!
 
-2:              ldi     27, 0x01
+2:          ldi     27, 0x01
+
 temp:		st	X+, r1
 		cpi	r27, 0x05
 		brne	temp
 
+
 asminit:
-		eor	r4, r4
-		eor	r5, r5
-		inc	r4
-		eor	r2, r2
-		inc	r2
-		mov	r3, r2
-		inc	r3
-
-		ldi	r16, lo8(story)
-		sts	storyptr, r16
-		ldi	r16, hi8(story)
-		sts	storyptr+1, r16
-		ldi	r16, lo8(m_song)
-		sts	songptr, r16
-		ldi	r16, hi8(m_song)
-		sts	songptr+1, r16
-
-		sts	vblvector, r2
-		sts	mlvector, r2
-
-		sei
 		rjmp	mainloop
 
-
 __vector_11:
-                reti
+
+	reti
 
 
 mainloop:
