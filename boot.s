@@ -5,6 +5,8 @@
 
 	.section ".vectors"
 
+SMRC = 	0x33
+
 __vectors:
 	rjmp 	main                    ; Vector for start of projects
 
@@ -49,11 +51,15 @@ main:
 3:	st	X+, r1
 	cpi	r27, 0x05
 	brne	3b
-	cli
+	
 
 
 asminit:
-	rjmp	mainloop
+;; Set Sleep mode
+	out SMRC, 1
+1:
+	sleep
+	rjmp	1b
 
 ; 	Horizontal blank intterupt       
 __vector_11:

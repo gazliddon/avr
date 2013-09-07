@@ -2,6 +2,7 @@
 
 PROJECT := avr
 TYPE := atmega88
+FREQ := 20000000
 
 AVR_SIM := ../simavr/simavr/run_avr 
 
@@ -44,8 +45,8 @@ clean:
 	@rm -rf $(BUILD_DIR)
 
 run : all
-	$(AVR_SIM) -m $(TYPE) -g $(DEBUG_FILE)
-	@ehco All run!
+	$(AVR_SIM) -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
+	@echo All run!
 
 debug : all
 	avr-gdb -tui $(DEBUG_FILE) -ex 'target remote :1234'
