@@ -15,6 +15,7 @@
 	rjmp 	__vector_11
 
 	.section ".text"
+
 __vector_01:
 __vector_02:
 __vector_03:
@@ -33,18 +34,19 @@ __vector_11:
 	nop
 	reti
 
-COUNT = 0xf000
+COUNT = 0x1000
 
 main:   cli
 	ldi r30, lo8(gpoke)
 	ldi r31, hi8(gpoke)
 	rcall doPokes
-
 	sei
-1:
-	rjmp 1b
+1: 	rjmp 1b
 
-gpoke:	.byte TCCR1A, 0
+	.section ".data"
+
+gpoke:
+	.byte TCCR1A, 0
 	.byte TCCR1B, 0
 	.byte TCNT1L, 0
 	.byte TCNT1H, 0
@@ -54,4 +56,5 @@ gpoke:	.byte TCCR1A, 0
 	.byte TCCR1B, ((1<< WGM12) | (1<<CS12))
 	.byte TIMSK1, (1 << OCIE1A)
 	.byte 0,0
+
 
