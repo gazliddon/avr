@@ -1,0 +1,10 @@
+# Definition file of what needs tracing
+# Usually you'd do this with C macros
+# But I'm writing assembler
+
+cpu: atmega88
+
+trace:
+    - DDRB
+    - TCCR0B
+
