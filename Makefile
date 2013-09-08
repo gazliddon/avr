@@ -4,7 +4,8 @@ PROJECT := avr
 TYPE := atmega88
 FREQ := 20000000
 
-AVR_SIM := ../simavr/simavr/run_avr 
+
+AVR_SIM := 	../simavr/simavr/run_avr 
 
 SOURCE := 	$(wildcard *.s)
 INCLUDES := 	$(wildcard *.i)  
@@ -47,6 +48,15 @@ clean:
 run : all
 	$(AVR_SIM) -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
 	@echo All run!
+
+debugrun : all
+	$(AVR_SIM) -g -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
+	@echo All run!
+
+trace : all
+	$(AVR_SIM) -r -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
+	@echo All run!
+
 
 debug : all
 	avr-gdb -tui $(DEBUG_FILE) -ex 'target remote :1234'
