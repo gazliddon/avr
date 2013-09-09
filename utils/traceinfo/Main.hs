@@ -1,3 +1,4 @@
+
 module Main where
 
 import Data.Yaml.YamlLight
@@ -29,30 +30,27 @@ data AvrTagEnum =
 	| AVR_MMCU_TAG_VCD_FILENAME
 	| AVR_MMCU_TAG_VCD_PERIOD
 	| AVR_MMCU_TAG_VCD_TRACE
+
   deriving (Enum)
 
-data AvrStr = AvrStr {
-  strTag :: AvrTagEnum,
-  strName :: String
-}
+asmAscii str = ".ascii \"" ++ str ++ "\""
+asmByte val = ".byte " ++ show val
+ret = "\n"
 
-data AvrLong = AvrLong {
-  longTag :: AvrTagEnum,
-  longVal :: Integer
-}
+class AvrTag a where
+  len :: a -> Int
+  tag :: a -> String
 
-data AvrAddr = AvrAddr {
-  addrTag :: AvrTagEnum,
-  addrVal :: String
-}
+  getTagString :: a -> String
+  getTagString a = asmAscii (tag a) ++ ret ++ asmByte (len a) ++ ret
+  getSource :: a -> String
 
-data AvrTrace  = AvrTrace {
-  traceTag :: AvrTagEnum,
-  traceMask :: Integer,
-  traceAddr :: String,
-  traceName :: String
-}
+data Symbol = Symbol { symbolName :: String, symbolMask :: Integer }
+instance AvrTag Symbol where
+  tag a = "AVR_MMCU_TAG_VCD_TRACE"
+  len a = length (symbolName a)
 
+  getSource a = getTagString a
 
 
 ---
