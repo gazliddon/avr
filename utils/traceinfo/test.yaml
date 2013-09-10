@@ -3,6 +3,7 @@
 # But I'm writing assembler
 
 cpu: atmega88
+freq: 20000000
 
 trace:
     - DDRB
