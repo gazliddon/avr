@@ -23,10 +23,11 @@ alignToColumn v str = str ++ replicate (max 0 (v - length str)) ' '
 
 asmLong = printf ".long %d"
 asmPtr = printf ".word %s"
-asmAsciiZ = printf ".asciiz \"%s\""
+asmAsciiZ = printf ".asciz \"%s\""
 asmByte  = printf ".byte %d"
 asmByteEqu = printf ".byte %s"
 
+strLen = ((+1) .length )
 
 -- AVR Tag Type Class  --
 class AvrTag a where
@@ -43,15 +44,28 @@ class AvrTag a where
   header a comment srcs =
     ";;" ++ intercalate ret ([ comment, getTagString a] ++ srcs)
 
+
+-- AVR VCD File --
+data AvrVCDFile = AvrVCDFile { vcdFile :: AvrString, vcdPeriod :: AvrLong }
+
+mkAvrVCDFile file period =
+  AvrVCDFile { vcdFile = AvrString "AVR_MMCU_TAG_VCD_FILENAME" file
+             , vcdPeriod = AvrLong "AVR_MMCU_TAG_VCD_PERIOD"   period }
+
+instance AvrTag AvrVCDFile where
+  len a = len (vcdFile a) + len (vcdPeriod a)
+  tag a = ""
+  getSource a = getSource (vcdFile a) ++ ret ++ getSource (vcdPeriod a)
+
+
 -- AVR String --
 data AvrString = AvrString { stringTag :: String, stringStr :: String  }
 
 
 instance AvrTag AvrString where
-   len a = length $ stringStr a
+   len a = (strLen . stringStr) a
    tag = stringTag
    getSource a = getTagString a ++ ret ++ defArrayToAsmLines [ asmAsciiZ (stringStr a) ]
-
 
 -- AVR Long --
 data AvrLong = AvrLong { longTag :: String, longVal :: Int  }
@@ -67,7 +81,7 @@ data AvrSymbol = AvrSymbol { symbolName :: String, symbolMask :: Int } deriving 
 
 instance AvrTag AvrSymbol where
   tag a = "AVR_MMCU_TAG_VCD_TRACE"
-  len a = length (symbolName a) + 1 + 2 + 1 -- term zero + mask + word ptr to symbol
+  len a = strLen (symbolName a) + 2 + 1 -- strlen + mask + word ptr to symbol
   getSource a =
     let (sym, mask) = ( symbolName a, symbolMask a )
         src =  defArrayToAsmLines [ defComment (asmByte mask) "Bit mask"
@@ -86,31 +100,35 @@ instance AvrTag AvrCpu where
                                           , getSource $ AvrLong "AVR_MMCU_TAG_FREQUENCY" $ cpuFreq a]
 
 -- AVR Trace List --
+section = defToAsmLine ".section " ++ show avrSection
+mmcu = "mmcu_:" 
+addRet a = a ++ ret
 
-getHeaderSize a = 2 * length (trTraces a)
-section = defToAsmLine ".section " ++ show avrSection 
-avrTracesHeader a text arr = section ++ ret ++ ret ++ header a text arr 
+avrTracesHeader a text arr =
+  concatMap addRet [ section
+                   , mmcu
+                   , header a text arr ] 
 
 data AvrTraces = AvrTraces { trTraces :: [AvrSymbol]
                            , trCpuType :: String
                            , trCpuFreq :: Int } deriving Show
 
 instance AvrTag AvrTraces where
-  len a = getHeaderSize a + sum (map len (trTraces a))
+  len a = 0
   tag a = "AVR_MMCU_TAG_VCD_TRACE"
   getSource a = avrTracesHeader a "All My Info" [ concatMap getSource $ trTraces a
                                                 , getSource $ AvrCpu (trCpuType a) (trCpuFreq a) ]
 
 traceFromRecord :: Y2T.TraceRecord -> String
 traceFromRecord tr =
-  let
-    traceObject = Avr.AvrTraces { trTraces =  map (`AvrSymbol` 0) $ Y2T.vars tr
-                                , trCpuType = Y2T.cpuType tr
-                                , trCpuFreq = Y2T.cpuFreq tr}
-  in
-    getSource traceObject
+  getSource $ Avr.AvrTraces { trTraces =  map (`AvrSymbol` 0) $ Y2T.vars tr
+                            , trCpuType = Y2T.cpuType tr
+                            , trCpuFreq = Y2T.cpuFreq tr}
 
-ttest = Y2T.TraceRecord { Y2T.cpuType = "atmega88"
+ttest = traceFromRecord $ Y2T.TraceRecord { Y2T.cpuType = "atmega88"
                         , Y2T.cpuFreq = 20000000
-                        , Y2T.vars = ["DDRB","TCCR0B"] }
+                        , Y2T.vars = ["DDRB","TCCR0B"]
+                        , Y2T.vcdFile = "./trace.vcd"
+                        , Y2T.vcdPeriod = 1 }
+
 

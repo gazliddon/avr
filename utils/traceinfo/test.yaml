@@ -9,3 +9,6 @@ trace:
     - DDRB
     - TCCR0B
 
+vcdFile: test.vcd
+vcdPeriod: 1
+
