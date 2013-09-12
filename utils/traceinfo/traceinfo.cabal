@@ -16,5 +16,5 @@ cabal-version:       >=1.8
 
 executable traceinfo
   main-is:             Main.hs         
-  other-modules:       Avr       
+  other-modules:              
   build-depends:       base ==4.6.*, yaml, bytestring, yaml-light

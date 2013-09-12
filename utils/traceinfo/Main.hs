@@ -4,23 +4,23 @@ import Data.Yaml.YamlLight
 import qualified Data.ByteString.Char8 as BS
 import Data.Maybe
 import Control.Applicative
-import qualified Avr 
+import qualified AvrFromTraceRecord as AvrTr 
 import qualified YamlToTrace as Y2T
 import Data.Typeable
 
 ---
 testFileName = "test.yaml"
 
-getSourceCode yaml =
-  Avr.traceFromRecord <$> Y2T.getValues yaml
+
+getSourceCode yaml = 
+  AvrTr.makeSourceFromRec $ Y2T.getValues yaml
+
 
 ---
 main = do
   fileText <- readFile testFileName
   putStrLn fileText
-  fileData <- parseYaml fileText
-  let sourceCode = fromJust $ getSourceCode fileData
-  let x =  typeOf sourceCode
-  putStrLn sourceCode
+  yaml <- parseYaml fileText
+  putStrLn $ getSourceCode yaml
   return ()
 

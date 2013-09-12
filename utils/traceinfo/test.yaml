@@ -6,9 +6,9 @@ cpu: atmega88
 freq: 20000000
 
 trace:
-    - DDRB
-    - TCCR0B
+    - mem_DDRB
+    - mem_TCCR0B
 
 vcdFile: test.vcd
-vcdPeriod: 1
+vcdPeriod: 10
 
