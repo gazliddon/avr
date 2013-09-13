@@ -6,8 +6,8 @@ cpu: atmega88
 freq: 20000000
 
 trace:
-    - mem_SREG
+    - mem_PORTD 
 
 vcdFile: avr.vcd
-vcdPeriod: 10
+vcdPeriod: 5000
 

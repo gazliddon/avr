@@ -1,12 +1,12 @@
 
-        .global         gotoSleep
+        .global         exit
         .global         doPokes
 
  ;;       .include        "stuff.i"
         .include        "avr.i"
 
 ;; Puts the machine to sleep
-gotoSleep:
+exit:
         cli
 	out SMCR, 1
 	sleep

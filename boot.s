@@ -1,4 +1,5 @@
 	.include "avr.i"
+	.include "ports.i"
 
 	.section ".vectors"
 	rjmp 	main                    ; v01 Vector for start of projects
@@ -26,7 +27,7 @@ __vector_07:
 __vector_08:
 __vector_09:
 __vector_10:
-	rjmp gotoSleep
+	rjmp exit
 
 
 ; 	Horizontal blank intterupt       
@@ -34,19 +35,21 @@ __vector_11:
 	push 	r16
 	in 	r16, SREG
 	push 	r16
-	push 	r30
-	push 	r31
+	push 	r26
+	push 	r27
 
-	ldi 	r30, lo8(myVar)
-	ldi 	r31, hi8(myVar)
+	ldi 	r26, lo8(myVar)
+	ldi 	r27, hi8(myVar)
 
 	;; Increment myVar by 1
-	lpm 	r1,Z 		; Get the val we're writing
+	ld 	r1,X 		; Get the val we're writing
 	inc 	r1
-	st 	Z,r1 		; store it to *X (26:27)
-	
-	pop 	r31
-	pop 	r30
+	st 	X,r1 		; store it to *X (26:27)
+
+	out 	PORTD, r1 	; Output it on port d
+
+	pop 	r27
+	pop 	r26
 	pop 	r16
 	out 	SREG, r16
 	pop 	r16
@@ -55,9 +58,12 @@ __vector_11:
 
 main:
 	cli
+	
 	ldi 	r30, lo8(gpoke)
 	ldi 	r31, hi8(gpoke)
 	rcall 	doPokes
+	
+
 	sei
 1: 	rjmp	1b
 
@@ -70,6 +76,8 @@ myVar:	.byte 0
 
 	COUNT = 0x1000
 gpoke:
+	.byte mem_DDRB,0x7f
+
 	.byte TCCR1A, 0
 	.byte TCCR1B, 0
 	.byte TCNT1L, 0
