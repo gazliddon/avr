@@ -7,6 +7,7 @@ import Control.Applicative
 import qualified AvrFromTraceRecord as AvrTr 
 import qualified YamlToTrace as Y2T
 import Data.Typeable
+import System.Environment
 
 ---
 testFileName = "test.yaml"
@@ -18,8 +19,8 @@ getSourceCode yaml =
 
 ---
 main = do
-  fileText <- readFile testFileName
-  putStrLn fileText
+  file <- head <$> getArgs 
+  fileText <- readFile file
   yaml <- parseYaml fileText
   putStrLn $ getSourceCode yaml
   return ()

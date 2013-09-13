@@ -11,7 +11,16 @@ fromTraceRec rec =
         , AvrLong "AVR_MMCU_TAG_VCD_PERIOD" $ Y2T.vcdPeriod rec]
         ++ map (AvrSymbol 0) (Y2T.vars rec)
 
-sourcHeader = sourceBlock [".section \".mmcu\"", ".global _mmcu"] ++ "_mmcu:" ++ "\n"
+quotedDirective d a =  d ++ " " ++ show a 
+inc a = quotedDirective ".include" a
+sec a = quotedDirective ".section" a
+
+
+sourcHeader = sourceBlock [ inc "avr.i"
+                          , inc "ports.i"
+                          , sec ".mmcu"
+                          , ".global _mmcu" ]
+                          ++ "_mmcu:" ++ "\n"
 sourceBlock a = concatMap (printf "\t%s\n") a ++ "\n" 
 makeSourceFromRec rec = (++) sourcHeader $ concatMap (sourceBlock . source) $ fromTraceRec rec
 
