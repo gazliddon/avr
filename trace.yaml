@@ -1,0 +1,13 @@
+# Definition file of what needs tracing
+# Usually you'd do this with C macros
+# But I'm writing assembler
+
+cpu: atmega88
+freq: 20000000
+
+trace:
+    - mem_SREG
+
+vcdFile: avr.vcd
+vcdPeriod: 10
+

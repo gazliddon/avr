@@ -28,23 +28,47 @@ __vector_09:
 __vector_10:
 	rjmp gotoSleep
 
+
 ; 	Horizontal blank intterupt       
 __vector_11:
-	nop
-	nop
+	push 	r16
+	in 	r16, SREG
+	push 	r16
+	push 	r30
+	push 	r31
+
+	ldi 	r30, lo8(myVar)
+	ldi 	r31, hi8(myVar)
+
+	;; Increment myVar by 1
+	lpm 	r1,Z 		; Get the val we're writing
+	inc 	r1
+	st 	Z,r1 		; store it to *X (26:27)
+	
+	pop 	r31
+	pop 	r30
+	pop 	r16
+	out 	SREG, r16
+	pop 	r16
 	reti
 
-COUNT = 0x1000
 
-main:   cli
-	ldi r30, lo8(gpoke)
-	ldi r31, hi8(gpoke)
-	rcall doPokes
+main:
+	cli
+	ldi 	r30, lo8(gpoke)
+	ldi 	r31, hi8(gpoke)
+	rcall 	doPokes
 	sei
-1: 	rjmp 1b
+1: 	rjmp	1b
+
+	.section ".bss"
+
+	.global myVar
+myVar:	.byte 0
 
 	.section ".data"
 
+	COUNT = 0x1000
 gpoke:
 	.byte TCCR1A, 0
 	.byte TCCR1B, 0

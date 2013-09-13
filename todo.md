@@ -1,22 +1,19 @@
-# Environment
+# Get MCU working
 
+
+
+# ----
+
+## Done
+- Include the right section
+- Initialise with _mmcu
+- Make sure AVR_MMCU_TAG_NAME len is corect (String error?)
+- Change asciiz to asciz
+- Make sure trace file is going to correct place
+  - Include set trace file command into avr stuff
+
+# Environment
 - Stop auto complete on tab?
 - Set tab size and to softtabs
 
-
-# Sleep to return control to the simulator
-
-Enable slpeep mode
-set sleep mode in SMCR
-b0 SE   Sleep enable
-b1 SM0  Mode
-b2 SM1
-b3 SM2
-
-1011 = power down = 11
-1101 = standby  = 13
-
-;; Set Sleep mode
-  out SMCR, 0b00001011
-  sleep
 
