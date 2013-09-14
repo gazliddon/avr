@@ -9,5 +9,5 @@ trace:
     - mem_PORTD 
 
 vcdFile: avr.vcd
-vcdPeriod: 5000
+vcdPeriod: 1
 

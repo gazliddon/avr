@@ -1,7 +1,8 @@
 	.include "avr.i"
 	.include "ports.i"
+	.include "delays.i"
 
-	.section ".vectors"
+	.section .vectors
 	rjmp 	main                    ; v01 Vector for start of projects
 	rjmp 	__vector_01
 	rjmp 	__vector_02
@@ -15,7 +16,7 @@
 	rjmp 	__vector_10
 	rjmp 	__vector_11
 
-	.section ".text"
+	.section .text
 
 __vector_01:
 __vector_02:
@@ -27,8 +28,7 @@ __vector_07:
 __vector_08:
 __vector_09:
 __vector_10:
-	rjmp exit
-
+	rjmp sleep
 
 ; 	Horizontal blank intterupt       
 __vector_11:
@@ -48,6 +48,26 @@ __vector_11:
 
 	out 	PORTD, r1 	; Output it on port d
 
+	ldi 	r16,10
+	rjmp 	delayxplus161
+	eor 	r1,r1
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+
+	out 	PORTD, r1
+
+
+	mov 	r16,r1
+	cpi 	r16,5
+	brne 	1f
+	rjmp    sleep
+1:
 	pop 	r27
 	pop 	r26
 	pop 	r16
@@ -62,17 +82,21 @@ main:
 	ldi 	r30, lo8(gpoke)
 	ldi 	r31, hi8(gpoke)
 	rcall 	doPokes
-	
 
 	sei
-1: 	rjmp	1b
+2: 	
+	rjmp	2b
 
-	.section ".bss"
 
-	.global myVar
-myVar:	.byte 0
 
-	.section ".data"
+blitInit:
+	
+	ret
+	
+blitLine:
+	ret
+
+
 
 	COUNT = 0x1000
 gpoke:
@@ -88,5 +112,9 @@ gpoke:
 	.byte TCCR1B, ((1<< WGM12) | (1<<CS12))
 	.byte TIMSK1, (1 << OCIE1A)
 	.byte 0,0
+
+
+	.section .bss
+myVar:	.byte	0
 
 

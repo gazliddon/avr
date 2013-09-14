@@ -1,7 +1,7 @@
 # Avr makfile
 
 PROJECT := avr
-TYPE := atmega88
+TYPE := atmega88 
 FREQ := 20000000
 
 AVR_SIM := 	../simavr/simavr/run_avr 
@@ -28,6 +28,9 @@ OBJ_FILES :=  	$(OBJ_FILES) $(OBJ_DIR)/trace.o
 all : $(ALL_DIRS) $(DEBUG_FILE)
 	@echo All done
 
+COMP :=  @avr-gcc -nostdlib -g -c -mmcu=$(TYPE) 
+LNK := 	 @avr-gcc -Xlinker -Tdata -Xlinker 0x800100 -nostdlib 
+
 # Directories
 $(ALL_DIRS) :
 	@mkdir -p $@
@@ -35,7 +38,7 @@ $(ALL_DIRS) :
 
 # File we can debug with
 $(DEBUG_FILE) : $(OBJ_FILES)
-	@avr-ld --section-start=.boot=0x0 -nostdlib -o $@ $^ -Map $(MAP_FILE)
+	$(LNK) -o $@ $^ 
 	@echo Created $@
 
 $(OBJ_FILES) : Makefile $(INCLUDES)
@@ -43,12 +46,12 @@ $(OBJ_FILES) : Makefile $(INCLUDES)
 # Compile asm -> o
 $(OBJ_DIR)/%.o : %.s
 	@echo Compiling $<
-	@avr-as -g -o $@ --fatal-warnings -mmcu=$(TYPE) $<
+	$(COMP) -o $@ $<
 
 # yaml -> compiled source
 $(OBJ_DIR)/%.o : %.yaml
-	$(TRACE_INFO) $<> $(TMP_DIR)/tmp.s
-	@avr-as -g -o $@ --fatal-warnings -mmcu=$(TYPE) $(TMP_DIR)/tmp.s
+	$(TRACE_INFO) $< > $(TMP_DIR)/tmp.s
+	$(COMP) -o $@ $(TMP_DIR)/tmp.s
 
 # Clean all intermediate files
 .PHONY : clean

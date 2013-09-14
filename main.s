@@ -2,7 +2,7 @@
 
 #include "stuff.i"
 
-
+	.global  	delayxplus161
 delayxplus161:	; 3 + 13 + x
 
 1:		subi	r16, 3			;				1   \_ 3 * (x / 3) + 2
