@@ -15,7 +15,7 @@
 	.global 	delay3xplus8
 	.global 	delay3xplus7
 	.global 	delay3xplus6
-
+	.global  	delayxplus161
 
 delay15:	nop
 delay14:	rjmp	.
