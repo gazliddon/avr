@@ -30,9 +30,11 @@ delay11:	rjmp	delay9
 delay3xplus8:	nop
 delay3xplus7:	nop
 delay3xplus6:
-1:		subi	r16, 1			;				1
-		brsh	1b			;				2 in loop, 1 otherwise
-		ret				;				4
+1:		subi	r16, 1			;	1
+		brne	1b			;	2 in loop, 1 otherwise
+		ret				;	4
+
+; 3 x r16 + 5
 
 
 delayxplus161:	; 3 + 13 + x

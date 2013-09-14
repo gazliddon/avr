@@ -83,12 +83,19 @@ hlineStart:
         nop                     ; c = 519
         nop                     ; c = 520
 
-        out PORTB, r1           ; c = 521 Hysnc on
+        out PORTB, r1           ; 0 c = 521 Hysnc on turn off in 76 cycles
 
-        ldi     r16, 28         ; c = 522
-        rcall   delay3xplus8    ; c = 523 92 cycles
-
-        out PORTB, r0           ; c = 614 Hsync off
+; 3 x r16 + 8 including call
+		
+        ldi     r16, 20         ;  1 c = 522
+        rcall   delay3xplus8    ;  2 c = 523 = 68
+        nop                     ; 70 c = 591
+        nop                     ; 71 c = 592
+        nop                     ; 72 c = 593
+        nop                     ; 73 c = 594
+        nop                     ; 74 c = 595
+        nop                     ; 75 c = 596
+        out PORTB, r0           ; 76 c = 597 Hsync off
 
         out     PORTC, r1       ; Signature so we know we ended
         out     PORTC, r0
