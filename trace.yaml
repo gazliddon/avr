@@ -1,12 +1,14 @@
 # Definition file of what needs tracing
 # Usually you'd do this with C macros
-# But I'm writing assembler
+# But I'm writing assembler so it's yaml -> haskell util -> assembler -> object file :)
 
 cpu: atmega88
 freq: 20000000
 
 trace:
-    - mem_PORTD 
+    - mem_PORTB
+    - mem_PORTC
+    - mem_PORTD
 
 vcdFile: avr.vcd
 vcdPeriod: 1

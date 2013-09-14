@@ -83,6 +83,9 @@ main:
 	ldi 	r31, hi8(gpoke)
 	rcall 	doPokes
 
+
+	rjmp 	hlineTest
+
 	sei
 2: 	
 	rjmp	2b
