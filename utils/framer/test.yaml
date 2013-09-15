@@ -1,0 +1,59 @@
+
+# a list of screens
+#   A screen has a name
+#     the name is used for sequencing the demo
+#     and also the name of the foreground routine to call
+#     during this routine
+
+#  A screen has a load of lines
+
+#     A line has
+#       A duration - number of scan lines it will run for
+#       A name - assembler neends two routines <name>_init && <name>_run
+#         <name>_init is called for the first line
+#         <name>_run is called for the remaining lines
+#         If duration is 1 line then <name>_init is called but <name>_run isn't
+#         Routine *MUST* complete in 490 cycles
+
+#         If start isn't specified then the start will be after previous line
+#         If start isn't specified and it's the first line the start will be at line 0
+
+#         All lines must be complete by line 479
+
+testLine:
+  name: hTest
+  duration: 10
+  start: 20
+
+testLineSeq:
+
+  - name: blue
+    duration:  5
+    start: 10
+
+  - name: hTetst2
+    duration: 10
+
+
+
+#screen:
+#  - name: testFrame
+#    lines:
+#      - { name: hTest,   duration: 10, start: 20 }
+#
+#  - name: testFrame2
+#    lines:
+#      - { name: blue,    duration:  5, start: 10 }
+#      - { name: hTetst2, duration: 10, }
+#      - { name: green,   duration:  2, }
+
+# A squence is a succesion of screens
+# it has a
+#   time : time in seconds for the scree to be active
+#   screen: name of the screen to play
+# Screens will play for time seconds
+
+#sequence:
+#  - {time: 1.5, screen: testFrame }
+#  - {time: 2.1, screen: testFrame2 }
+
