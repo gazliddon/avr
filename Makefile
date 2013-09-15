@@ -13,15 +13,17 @@ BUILD_DIR :=	build
 OBJ_DIR := 	$(BUILD_DIR)/objs
 FIRMWARE_DIR := $(BUILD_DIR)/firmware
 TMP_DIR := 	$(BUILD_DIR)/tmp
-ALL_DIRS := 	$(OBJ_DIR) $(FIRMWARE_DIR) $(TMP_DIR)
+TRACE_DIR := 	$(BUILD_DIR)/trace
+
+ALL_DIRS := 	$(TRACE_DIR) $(OBJ_DIR) $(FIRMWARE_DIR) $(TMP_DIR)
 
 UTILS_DIR := 	utils
-
 
 DEBUG_FILE := 	$(BUILD_DIR)/$(PROJECT).axf
 MAP_FILE := 	$(BUILD_DIR)/$(PROJECT).map
 OBJ_FILES := 	$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOURCE)))$(TEMP))) 
 TRACE_INFO := 	$(UTILS_DIR)/traceinfo/dist/build/traceinfo/traceinfo
+
 
 OBJ_FILES :=  	$(OBJ_FILES) $(OBJ_DIR)/trace.o  
 

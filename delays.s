@@ -34,7 +34,8 @@ delay3xplus6:
 		brne	1b			;	2 in loop, 1 otherwise
 		ret				;	4
 
-; 3 x r16 + 5
+; 3 x r16 + 8 including call
+
 
 
 delayxplus161:	; 3 + 13 + x

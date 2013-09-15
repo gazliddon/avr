@@ -83,8 +83,9 @@ main:
 	ldi 	r31, hi8(gpoke)
 	rcall 	doPokes
 
+                
 
-	rjmp 	hlineTest
+	rjmp 	hlineTest2
 
 	sei
 2: 	
@@ -103,7 +104,9 @@ blitLine:
 
 	COUNT = 0x1000
 gpoke:
-	.byte mem_DDRB,0x7f
+	.byte mem_DDRB,0xff
+	.byte mem_DDRC,0xff
+	.byte mem_DDRD,0xff
 
 	.byte TCCR1A, 0
 	.byte TCCR1B, 0

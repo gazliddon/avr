@@ -10,7 +10,14 @@ import Data.Maybe
 
 -- Generic code for fetching things out of yaml with default values
 
+
+getWithString :: YL.YamlLight -> String -> Maybe YL.YamlLight
+getWithString yaml key = (YL.lookupYL . YL.YStr . BS.pack) key yaml 
+
 class GetYaml a where
+
+  getNoDefault :: YL.YamlLight -> String -> Maybe a
+  getNoDefault yaml key = getWithString yaml key >>= getFun
 
   getFun :: YL.YamlLight -> Maybe a
 
@@ -23,8 +30,8 @@ class GetYaml a where
   getGeneric :: (Read a) => YL.YamlLight -> Maybe a
   getGeneric y = getFun y >>= Just . read
 
-instance GetYaml String   where getFun y =  YL.unStr y >>= Just . BS.unpack
 
+instance GetYaml String   where getFun y =  YL.unStr y >>= Just . BS.unpack
 instance GetYaml Int      where getFun =    getGeneric   
 instance GetYaml [String] where getFun =    getSeq 
 

@@ -6,6 +6,7 @@
 #     during this routine
 
 #  A screen has a load of lines
+
 #     A line has
 #       A duration - number of scan lines it will run for
 #       A name - assembler neends two routines <name>_init && <name>_run
@@ -13,6 +14,12 @@
 #         <name>_run is called for the remaining lines
 #         If duration is 1 line then <name>_init is called but <name>_run isn't
 #         Routine *MUST* complete in 490 cycles
+
+#         If start isn't specified then the start will be after previous line
+#         If start isn't specified and it's the first line the start will be at line 0
+
+#         All lines must be complete by line 479
+
 
 screen:
   - name: testFrame
@@ -25,7 +32,13 @@ screen:
         { name: hTetst2, duration: 10, }
         { name: green,   duration:  2, }
 
+# A squence is a succesion of screens
+# it has a
+#   time : time in seconds for the scree to be active
+#   screen: name of the screen to play
+# Screens will play for time seconds
 
 sequence:
-  - {time: 1.5, frame: testFrame }
-    {time: 2.1, frame: testFrame2 }
+  - {time: 1.5, screen: testFrame }
+    {time: 2.1, screen: testFrame2 }
+

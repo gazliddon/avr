@@ -9,6 +9,7 @@ trace:
     - mem_PORTB
     - mem_PORTC
     - mem_PORTD
+    - mem_TCNT0
 
 vcdFile: avr.vcd
 vcdPeriod: 1

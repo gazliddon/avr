@@ -2,3 +2,5 @@ build
 Session.vim
 .exrc
 local
+.gtkwaverc
+test.vcd
