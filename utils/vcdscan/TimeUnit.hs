@@ -1,7 +1,7 @@
 module TimeUnit ( TimeUnit,
                   findTimeTypeFromSymbol,
-                  findTimeTypeFromName,
                   allTimeUnits,
+
                   getString,
                   getBestString,
 
@@ -10,8 +10,15 @@ module TimeUnit ( TimeUnit,
 
 import Data.List
 import Data.Function
+import Numeric
+
+-- Could probably go in some generic utils
+getOrderOfMagnitude 0 = 0
+getOrderOfMagnitude v  = floor . logBase 10 $ v  
 
 data TimeUnit = TimeUnit {symbol :: String, name :: String, hz :: Double} deriving Show
+
+secsToUnit t val = val / hz t
 
 seconds =      TimeUnit "s"  "seconds"        1
 milliSeconds = TimeUnit "ms" "milliseconds" ( 1 / 1000)
@@ -23,27 +30,18 @@ allTimeUnits = [ seconds,
                  microSeconds,
                  nanoSeconds ]
 
-findOnKey xs k val = [x |  x <- xs, (k x) == val ]
+findOnKey xs k val = [x |  x <- xs, k x == val ]
 retFirstFunc [] = Nothing
 retFirstFunc x = Just . head $ x
+findInTimeUnits k val = retFirstFunc $ findOnKey allTimeUnits k val
 
-findInTimeUnits k val = retFirstFunc $ (findOnKey allTimeUnits) k val
+findTimeTypeFromSymbol  = findInTimeUnits symbol 
 
-findTimeTypeFromSymbol str = findInTimeUnits symbol str
-findTimeTypeFromName str = findInTimeUnits name str
-
-secsToUnit t val = val / hz t
-
-dist val t = 1 - (abs $ (hz t) -  (secsToUnit t val)) 
-
-getSorted val = reverse $ sortBy (compare `on` (dist val)) allTimeUnits  
-
-adjFunc t = abs $ 1 - t
-
-getSortedKey val = map (\x -> ( symbol x, (secsToUnit x val) , adjFunc (secsToUnit x val)  )) $ getSorted val
+dist val t = (getOrderOfMagnitude . secsToUnit t) val 
+getSorted val = filter ( (>= 0) . dist val ) $ sortBy (compare `on` dist val) allTimeUnits
 
 findBestTimeUnit val = head (getSorted val)
 
-getString t val = show (val / hz t) ++ (symbol t)
+getString t val = showFFloat (Just 2) (val / hz t) $ symbol t
 getBestString val = getString (findBestTimeUnit val) val
 
