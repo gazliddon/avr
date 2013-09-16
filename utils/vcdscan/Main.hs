@@ -8,6 +8,19 @@ import Control.Applicative hiding (many, (<|>) )
 
 import ParsecHelper
 
+data TimeUnit = TimeUnit {tuSymbol :: String, tuName :: String, tuHz :: Float}
+
+seconds =      TimeUnit "s"  "seconds"       1
+milliSeconds = TimeUnit "ms" "milliseconds" (1 / 1000)
+microSeconds = TimeUnit "us" "microseconds" ( 1 / 1000 / 1000)
+nanoSeconds =  TimeUnit "ns" "nanoseconds"  ( 1 / 1000 / 1000 / 1000)
+
+
+unitsToHz "s" = Right (TimeUnit 
+unitsToHz "ms" =
+
+
+
 data VCDVal = Command String String
             | TimeScale Int 
             | Var Int String String
