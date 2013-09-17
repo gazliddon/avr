@@ -1,11 +1,23 @@
 ;; Some miscellaneous utility routines
+        .include        "avr.i"
 
         .global         sleep
         .global         doPokes
 	.global 	r012
+	.global 	portCMark
 
- ;;       .include        "stuff.i"
-        .include        "avr.i"
+;; Test pattern;; Alternates between r1 and r0
+;; loop cycles = (r16 * 6) + 1 
+;; overhead = 5
+;; r16 = 82 = 492 cycles
+
+portCMark:
+	;; Mark for the start of test so trace will get it
+	out 	PORTC, r0
+	out 	PORTC, r1
+	out 	PORTC, r2
+	out 	PORTC, r0
+	ret
 
 ;; 	r0 = 0
 ;; 	r1 = 1
