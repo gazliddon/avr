@@ -22,8 +22,9 @@ UTILS_DIR := 	utils
 DEBUG_FILE := 	$(BUILD_DIR)/$(PROJECT).axf
 MAP_FILE := 	$(BUILD_DIR)/$(PROJECT).map
 OBJ_FILES := 	$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOURCE)))$(TEMP))) 
-TRACE_INFO := 	$(UTILS_DIR)/traceinfo/dist/build/traceinfo/traceinfo
 
+TRACE_INFO := 	$(UTILS_DIR)/traceinfo/dist/build/traceinfo/traceinfo
+VCD_SCAN :=    $(UTILS_DIR)/vcdscan/dist/build/vcdscan/vcdscan
 
 OBJ_FILES :=  	$(OBJ_FILES) $(OBJ_DIR)/trace.o  
 
@@ -78,4 +79,7 @@ trace : all
 
 debug : all
 	avr-gdb -tui $(DEBUG_FILE) -ex 'target remote :1234'
-  
+ 
+
+analyse: run
+	$(VCD_SCAN) test.vcd

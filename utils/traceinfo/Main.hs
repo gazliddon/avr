@@ -12,16 +12,12 @@ import System.Environment
 ---
 testFileName = "test.yaml"
 
-
 getSourceCode yaml = 
   AvrTr.makeSourceFromRec $ Y2T.getValues yaml
 
-
 ---
 main = do
-  file <- head <$> getArgs 
-  fileText <- readFile file
-  yaml <- parseYaml fileText
+  yaml <- (head <$> getArgs) >>= parseYamlFile
   putStrLn $ getSourceCode yaml
   return ()
 

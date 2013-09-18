@@ -33,6 +33,7 @@ mainParse = [ parseVar,
               parseTimeScale,
               parseEvent,
               parseUnimplemented ]
+
 getCommands source = case parse (many $ toChoice mainParse) "VCD" source of
   Left err -> error $ "ERROR"
   Right val -> val

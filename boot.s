@@ -18,8 +18,15 @@
 
 	.section .text
 ; 	Horizontal blank intterupt       
+STACK_TOP = 0x2ff
+
 main:
 	cli
+	ldi 	r16, lo8(STACK_TOP)
+	out 	SPL, r16
+	ldi 	r16, hi8(STACK_TOP)
+	out  	SPH, r16
+
 	ldi 	r30, lo8(gpoke)
 	ldi 	r31, hi8(gpoke)
 	rcall 	doPokes
@@ -27,9 +34,12 @@ main:
         rjmp    hSyncInit
 
 
-CYCLES_PER_LINE = 634
+CYCLES_PER_LINE = 633
 
 gpoke:
+	.byte	0x4c,	0x50	;; SPCR
+	.byte	0x4d,	0x01	;; SPSR
+
 	.byte mem_DDRB,0xff
 	.byte mem_DDRC,0xff
 	.byte mem_DDRD,0xff
@@ -42,7 +52,7 @@ gpoke:
 	.byte OCR1AL, CYCLES_PER_LINE & 0xff
 	.byte OCR1AH, CYCLES_PER_LINE >> 8
 
-	.byte TCCR1B, ((1<< WGM12) | (1<<CS12))
+	.byte TCCR1B, ((1<< WGM12) | (1))
 	.byte TIMSK1, (1 << OCIE1A)
 	.byte 0,0
 
