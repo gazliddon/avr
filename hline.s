@@ -1,6 +1,7 @@
         .include        "ports.i"
         .include        "delays.i"
-	.include "avr.i"
+	.include 	"avr.i"
+	.include 	"copper.i"
 
 	.global 	hLineTest
 	.global 	hSyncISR	
@@ -149,87 +150,7 @@ jmp:
 	ret
 
 
-.macro 	line routine, repeats
-	.word \routine, \repeats
-.endm
-
-.macro jump dest
-	.word 	jmp, . - \dest
-.endm
-
-;; Y (28:29) -> table
-set_line_table:
-	sts line_table_pc, r28
-	sts line_table_pc+1,r29
-	ldd r16, Y+2
-	sts line_count, r16
-	ldd r16, Y+3
-	sts line_count+1, r16
-	ret
-
-
-
-;; 39 cycles + call overhead - can call this in back porch
-;; 42 = w call means 5 cycle lead in to pushing pixles :)
-;; reduce cycles by assign line_table_pc + count to regs
-jmp_next:
-	;; this block 14 cycles
-
-	lds 	r26,line_table_pc       ; 2 x -> entry in table
-	lds 	r27,line_table_pc+1     ; 2
-
-	ld 	r30,X+ 		  	; 2 get the routtine in Y
-	ld 	r31,X+ 			; 2
-
-	lds 	r16,line_count 	    	; 2 bump the count
-	sub 	r16,r1                  ; 1
-	lds 	r17,line_count+1        ; 2
-	sbc 	r17,r0                  ; 1
-
-	;; Both paths 15 cycles
-	brcc 	normal  		; (1/2) No need to get next command
-
-	
-	   ld 	 r16, X+ 	        ; 2 (3) Skip count record
-	   ld 	 r17, X+                ; 2 (5)
-	   ld 	 r30, X+ 	        ; 2 (7) Get new routine
-	   ld 	 r31, X+                ; 2 (9)
-	   ld 	 r16, X+ 	        ; 2 (11) get new count
-	   ld 	 r17, X+                ; 2 (13)
-	   rjmp  exit 			; 2 (15)
-
-normal:
-	   nop                          ; 1 (3)
-	   nop                          ; 1 (4)
-	   nop                          ; 1 (5)
-	   nop                          ; 1 (6)
-	   nop                          ; 1 (7)
-	   nop                          ; 1 (8)
-	   nop                          ; 1 (9)
-	   nop                          ; 1 (10)
-	   nop                          ; 1 (11)
-	   nop                          ; 1 (12)
-	   nop                          ; 1 (13)
-	   nop                          ; 1 (14)
-	   nop                          ; 1 (15)
-	
-exit:
-	;; 8 cycles
-	sts 	line_table_pc, r30      ; 2
-	sts 	line_table_pc+1, r31    ; 2
-	sts 	line_count, r16              ; 2
-	sts 	line_count+1, r17              ; 2
-
-jump_routine:
-	ret
-
-	ijmp                            ; 2
-
-
-
-
-
-test_line_table:
+test_copper_list:
 	line 	bmap_init,1
 	line 	bmap,250
 	line 	bmap,229
@@ -237,43 +158,41 @@ test_line_table:
 	line 	vsync_start,1
 	line 	vsync_end,1
 	line 	blank,32
-	jump 	test_line_table
+	jump    test_copper_list	
 
-test_line_table_size = . - test_line_table
+test_copper_list_size = . - test_copper_list
 
 
 hLineTest:
 	;; Copy line table from pgm rom -> memory
-	ldi 	r30, lo8(test_line_table)
-	ldi 	r31, hi8(test_line_table)
-	ldi 	r28, lo8(line_table_buffer)
-	ldi 	r29, hi8(line_table_buffer)
-	ldi 	r16, test_line_table_size
+	ldi 	r30, lo8(test_copper_list)
+	ldi 	r31, hi8(test_copper_list)
+	ldi 	r28, lo8(copper_list_buffer)
+	ldi 	r29, hi8(copper_list_buffer)
+	ldi 	r16, test_copper_list_size
 	rcall 	cp_pmem_to_mem
 
-	ldi 	r28, lo8(line_table_buffer)
-	ldi 	r29, hi8(line_table_buffer)
-	rcall 	set_line_table
+	ldi 	r28, lo8(copper_list_buffer)
+	ldi 	r29, hi8(copper_list_buffer)
+	rcall 	set_copper_list
 
 	out PORTC, r0
 	out PORTC, r1
-	rcall jmp_next
+	rcall copper_next
 	
 	out PORTC, r0
 	out PORTC, r1
-	rcall jmp_next
+	rcall copper_next
 	
 	out PORTC, r0
 	out PORTC, r1
 	
 	rjmp sleep
 
-
-
 	.section .bss
-line_table_pc: 		.long 	0
-line_count: 		.word 	0
-.comm line_table_buffer, test_line_table_size
+	.comm 	copper_list_pc, 2
+	.comm 	line_count, 2
+	.comm 	copper_list_buffer, test_copper_list_size
 
 
 
