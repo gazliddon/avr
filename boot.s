@@ -22,6 +22,7 @@ STACK_TOP = 0x2ff
 
 main:
 	cli
+
 	ldi 	r16, lo8(STACK_TOP)
 	out 	SPL, r16
 	ldi 	r16, hi8(STACK_TOP)
@@ -30,6 +31,10 @@ main:
 	ldi 	r30, lo8(gpoke)
 	ldi 	r31, hi8(gpoke)
 	rcall 	doPokes
+
+	rcall r012
+
+	rjmp hLineTest
 
         rjmp    hSyncInit
 
