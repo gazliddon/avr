@@ -77,9 +77,13 @@ trace : all
 	$(AVR_SIM) -r -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
 	@echo All run!
 
+# Launch the exe in the sim in the background listening for gdb
+# run gdb and connect to the sim
+# kill avr task - might not be there so ignore error
 debug : all
-	avr-gdb -tui $(DEBUG_FILE) -ex 'target remote :1234'
+	- $(AVR_SIM) -g -f $(FREQ) -m $(TYPE) $(DEBUG_FILE) & > /dev/null
+	avr-gdb -tui $(DEBUG_FILE) -x dbg.gdb
+	-killall avr
  
-
 analyse: run
 	$(VCD_SCAN) test.vcd
