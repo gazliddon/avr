@@ -5,6 +5,21 @@
         .global         doPokes
 	.global 	r012
 	.global 	portCMark
+	.global 	cp_pmem_to_mem
+
+
+;; Copy from PM to ram
+;; Z -> src
+;; Y -> dst
+;; r16 = lengthi
+;; r17 = trashed
+cp_pmem_to_mem:
+1:
+	lpm r17,Z+
+	st Y+, r17	
+	dec r16
+	brne 1b
+	ret
 
 ;; Test pattern;; Alternates between r1 and r0
 ;; loop cycles = (r16 * 6) + 1 
