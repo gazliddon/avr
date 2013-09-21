@@ -19,6 +19,7 @@ copper_jump:
         add r16,r1
         sts frameEnd, r16
 	
+        rjmp sleep
         rjmp set_copper_list
 
 ;; Y (28:29) -> table

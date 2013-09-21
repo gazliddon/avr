@@ -13,6 +13,8 @@
 
 hLineW:
 	.word 	0
+syncVals:
+	.word 	0
 
 frameEnd:
 	.word 	0
@@ -34,9 +36,6 @@ hSyncInit:
 
 	out 	PORTD, r1 		; Pixel data on
 
-
-
-
 ; 50 =  1250
 ; 70  = 1450
 ; 130 = 5250
@@ -57,7 +56,7 @@ t0start = 0
 1: 	out PORTC, r17
 	out PORTC, r18
 	lds 	r16, frameEnd
-	cp 	r16,r1
+	cp 	r16,r2
 	brne 	1b
 	cli
 
@@ -99,27 +98,26 @@ hSyncISR:
 	sts 	hLineW+1, r16 	; 1 (2)
 	;; -------->
 	
-	nop 	; 3
-	nop 	; 4
+	push r17 ; 2
 	nop 	; 5
 	nop 	; 6
 	nop 	; 7
 	nop 	; 8
-	nop 	; 9
-	nop 	; 10
-	nop 	; 11
+	lds 	r17,syncVals ; 9
+	or 	r17,r1       ; 11
+	out 	PORTB, r17    ; 12 (happens on 13)
 	
-	out 	PORTB, r1 		; 12  (1 (happens on 13))
-	
+	;; We're in Hysnc
 	ldi 	r16, 22    		; 3  (74)
 	rcall 	delay3xplus8 		;    (74) 
 
-	out 	PORTB, r0 		; 86 (1) (happens on 87, hsync duration == 74)
+	cbi 	PORTB, 0 		; 86 (1) (happens on 87, hsync duration == 74)
 
 	rcall  	copper_next
 
 	icall
 	
+	pop 	r17
 	pop 	r26
 	pop 	r27
 	pop 	r16
@@ -148,11 +146,13 @@ front_porch:
 	ret
 
 vsync_start:
+	sts 	syncVals, r2
 	ldi 	r16,4
 	out 	PORTD,r16
 	ret
 
 vsync_end:
+	sts 	syncVals, r0
 	ldi 	r16,5
 	out 	PORTD,r16
 	ret
