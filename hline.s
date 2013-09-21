@@ -8,6 +8,7 @@
 	.global 	hSyncInit
 
 
+	.global 	frameEnd
 	.section 	.bss
 
 hLineW:
@@ -15,7 +16,6 @@ hLineW:
 
 frameEnd:
 	.word 	0
-	
 	.section 	.text
 
 hSyncInit:
@@ -53,15 +53,12 @@ t0start = 0
 
 	sei
 
-	ldi r17,0xff
-	ldi r18,0x80
 	;; Do ten lines
 1: 	out PORTC, r17
 	out PORTC, r18
 	lds 	r16, frameEnd
-	tst 	r16
-	breq 	1b
-
+	cp 	r16,r1
+	brne 	1b
 	cli
 
 ;; exit
@@ -163,15 +160,7 @@ vsync_end:
 blank:	
 	ldi 	r16,6
 	out 	PORTD,r16
-	rjmp sleep	
 	ret
-
-;; Set the copper list pointer, call with r17:r16 -> new address
-jmp:	sts frameEnd, r1
-	mov r28,r16
-	mov r29,r17
-	rjmp sleep	
-	rjmp set_copper_list
 
 test_copper_list:
 	line 	bmap_init,1
