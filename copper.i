@@ -1,11 +1,11 @@
 
 
 .macro  line routine, repeats
-        .word \routine, \repeats
+        .word pm(\routine), \repeats
 .endm
 
 .macro jump dest
-        .word   jmp, . - \dest
+        .word   pm(\dest + 1)
 .endm
 
 

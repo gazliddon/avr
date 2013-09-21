@@ -65,16 +65,8 @@ run : all
 	$(AVR_SIM) -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
 	@echo All run!
 
-debugrun : all
-	$(AVR_SIM) -g -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
-	@echo All run!
-
 gdb : all
 	gdb -tui --args $(AVR_SIM) -g -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
-	@echo All run!
-
-trace : all
-	$(AVR_SIM) -r -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
 	@echo All run!
 
 # Launch the exe in the sim in the background listening for gdb

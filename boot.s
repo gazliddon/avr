@@ -33,9 +33,6 @@ main:
 	rcall 	doPokes
 
 	rcall r012
-
-	rjmp hLineTest
-
         rjmp    hSyncInit
 
 

@@ -11,14 +11,18 @@
 	.section 	.bss
 
 hLineW:
-	.word 		0
+	.word 	0
 
+frameEnd:
+	.word 	0
 	
 	.section 	.text
 
 hSyncInit:
 	rcall 	r012
 	rcall 	portCMark
+
+	rcall 	hLineTest
 
 	sts 	hLineW, r0 		;; Zero hline counter
 	sts 	hLineW+1, r0
@@ -29,6 +33,9 @@ hSyncInit:
 	out 	TCCR0B, 16
 
 	out 	PORTD, r1 		; Pixel data on
+
+
+
 
 ; 50 =  1250
 ; 70  = 1450
@@ -51,9 +58,9 @@ t0start = 0
 	;; Do ten lines
 1: 	out PORTC, r17
 	out PORTC, r18
-	lds 	r16, hLineW
-	cpi 	r16, 10
-	brne 	1b
+	lds 	r16, frameEnd
+	tst 	r16
+	breq 	1b
 
 	cli
 
@@ -90,13 +97,12 @@ hSyncISR:
 	sts 	hLineW, r27     ; 628 (2)
 	lds 	r16, hLineW+1   ; 630 (2)
 	adc 	r16,r0 		; 632 (1)
-	out TCNT0,r0 		; 633 (tcnt will be set on 634)
-	out PORTC,r0 		; 0 (happens on 1)
+	out TCNT0,r0 		; 633 (tcnt will be set on 0)
+	out PORTD,r0 		; 0 (happens on 1)
 	sts 	hLineW+1, r16 	; 1 (2)
 	;; -------->
 	
-	out PORTD, r0 		; 3 (happens on 4) Black out pixel data 
-
+	nop 	; 3
 	nop 	; 4
 	nop 	; 5
 	nop 	; 6
@@ -113,7 +119,9 @@ hSyncISR:
 
 	out 	PORTB, r0 		; 86 (1) (happens on 87, hsync duration == 74)
 
-	rcall 	lineRoutine
+	rcall  	copper_next
+
+	icall
 	
 	pop 	r26
 	pop 	r27
@@ -122,33 +130,48 @@ hSyncISR:
 	pop 	r16
 	reti
 
-lineRoutine:
-	out 	PORTD, r1 		; 77 (1) (hsync now low)
-	ldi 	r16,10
-	rcall 	delay3xplus8
-	out 	PORTD, r0
-	out 	PORTD, r2
-	ret
-
-
 ;; base of table
 ;; we need something to point to the entry in the line routine table
 ;; count
 
 
 bmap_init:
+	ldi 	r16,1
+	out 	PORTD,r16
 	ret
-bmap:
+
+bmap:	
+	ldi 	r16,2
+	out 	PORTD,r16
 	ret
 
 front_porch:
-vsync_start:
-vsync_end:
-blank:
-	ret
-jmp:
+	ldi 	r16,3
+	out 	PORTD,r16
 	ret
 
+vsync_start:
+	ldi 	r16,4
+	out 	PORTD,r16
+	ret
+
+vsync_end:
+	ldi 	r16,5
+	out 	PORTD,r16
+	ret
+
+blank:	
+	ldi 	r16,6
+	out 	PORTD,r16
+	rjmp sleep	
+	ret
+
+;; Set the copper list pointer, call with r17:r16 -> new address
+jmp:	sts frameEnd, r1
+	mov r28,r16
+	mov r29,r17
+	rjmp sleep	
+	rjmp set_copper_list
 
 test_copper_list:
 	line 	bmap_init,1
@@ -174,20 +197,7 @@ hLineTest:
 
 	ldi 	r28, lo8(copper_list_buffer)
 	ldi 	r29, hi8(copper_list_buffer)
-	rcall 	set_copper_list
-
-	out PORTC, r0
-	out PORTC, r1
-	rcall copper_next
-	
-	out PORTC, r0
-	out PORTC, r1
-	rcall copper_next
-	
-	out PORTC, r0
-	out PORTC, r1
-	
-	rjmp sleep
+	rjmp 	set_copper_list
 
 	.section .bss
 	.comm 	copper_list_pc, 2
