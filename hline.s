@@ -41,7 +41,7 @@ hSyncInit:
 ; 130 = 5250
 
 
-start = 50
+start = 80
 t0start = 0
 	ldi 	r16,lo8(start)
 	ldi 	r17,hi8(start)
@@ -53,8 +53,8 @@ t0start = 0
 	sei
 
 	;; Do ten lines
-1: 	out PORTC, r17
-	out PORTC, r18
+1: 	out PORTC, r1
+	out PORTC, r0
 	lds 	r16, frameEnd
 	cp 	r16,r2
 	brne 	1b
@@ -141,36 +141,36 @@ bmap:
 	ret
 
 front_porch:
-	ldi 	r16,3
-	out 	PORTD,r16
+	ldi 	r16,4
+	out     PORTD,R16
 	ret
 
 vsync_start:
-	sts 	syncVals, r2
-	ldi 	r16,4
+	ldi 	r16,5
 	out 	PORTD,r16
+	sts 	syncVals, r2
 	ret
 
 vsync_end:
-	sts 	syncVals, r0
-	ldi 	r16,5
+	ldi 	r16, 6
 	out 	PORTD,r16
+	sts 	syncVals, r0
 	ret
 
-blank:	
-	ldi 	r16,6
+blank:
+	ldi 	r16,7
 	out 	PORTD,r16
 	ret
 
 test_copper_list:
 	line 	bmap_init,1
-	line 	bmap,250
+	line 	bmap,251
 	line 	bmap,229
 	line 	front_porch,10
 	line 	vsync_start,1
 	line 	vsync_end,1
 	line 	blank,32
-	jump    test_copper_list	
+	loop
 
 test_copper_list_size = . - test_copper_list
 

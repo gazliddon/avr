@@ -1,6 +1,7 @@
 ;; Copper handling routines
 
 	.include 	"copper.i"
+	.include 	"ports.i"
 	.section 	.text
 
 ;; Globals
@@ -13,13 +14,11 @@
 copper_jump:
 	mov r28,r16
 	mov r29,r17
-        adiw r28,1
 
         lds r16, frameEnd       ; bump frameend
         add r16,r1
         sts frameEnd, r16
 	
-        rjmp sleep
         rjmp set_copper_list
 
 ;; Y (28:29) -> table
