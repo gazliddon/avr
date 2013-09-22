@@ -15,15 +15,6 @@ isVar _     = False
 isEvent Event{} = True
 isEvent _       = False
 
-findVars name xs = filter (\x -> (==) name (vrName x) ) $ filter isVar xs
-findEvents sym xs = filter (\x -> (==) sym (evSymbol x)) $ filter isEvent xs
-
-findEventsByVarName name xs = 
- let
-   vars = findVars name xs
-   ret [] = []
-   ret (v:_) = findEvents (vrSymbol v) xs
- in
-   ret vars
+duration a b = evTime b - evTime a
 
 
