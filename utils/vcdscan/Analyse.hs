@@ -28,7 +28,7 @@ findToggles name mask xs  = dropWhile ((==) 0 . (.&.) mask . evMask)
 hSyncDurations xs = findTogglesDuration "mem_PORTB" 1
 vSyncDurations xs = findTogglesDuration "mem_PORTB" 2
 
-testAnalyse xs = unlines . map show  $ findTogglesDuration "mem_PORTB" 2 xs
+testAnalyse xs = unlines . map show  $ findTogglesDuration "mem_PORTB" 1 xs
 
 -- Test Code
 
