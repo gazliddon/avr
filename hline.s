@@ -41,7 +41,7 @@ hSyncInit:
 ; 130 = 5250
 
 
-start = 80
+start = 50
 t0start = 0
 	ldi 	r16,lo8(start)
 	ldi 	r17,hi8(start)
@@ -93,7 +93,8 @@ hSyncISR:
 	sts 	hLineW, r27     ; 628 (2)
 	lds 	r16, hLineW+1   ; 630 (2)
 	adc 	r16,r0 		; 632 (1)
-	out TCNT0,r0 		; 633 (tcnt will be set on 0)
+	nop                     ; 633 (1)
+	out TCNT0,r0 		; 634 (tcnt will be set on 0)
 	out PORTD,r0 		; 0 (happens on 1)
 	sts 	hLineW+1, r16 	; 1 (2)
 	;; -------->
@@ -168,8 +169,9 @@ test_copper_list:
 	line 	bmap,229
 	line 	front_porch,10
 	line 	vsync_start,1
+	line 	blank,1
 	line 	vsync_end,1
-	line 	blank,32
+	line 	blank,31
 	loop
 
 test_copper_list_size = . - test_copper_list

@@ -35,8 +35,7 @@ main:
 	rcall r012
         rjmp    hSyncInit
 
-
-CYCLES_PER_LINE = 633
+CYCLES_PER_LINE = 635
 
 gpoke:
 	.byte	0x4c,	0x50	;; SPCR
@@ -51,8 +50,8 @@ gpoke:
 	.byte TCNT1L, 0
 	.byte TCNT1H, 0
 
-	.byte OCR1AL, CYCLES_PER_LINE & 0xff
-	.byte OCR1AH, CYCLES_PER_LINE >> 8
+	.byte OCR1AL, (CYCLES_PER_LINE -1) & 0xff
+	.byte OCR1AH, (CYCLES_PER_LINE -1)>> 8
 
 	.byte TCCR1B, ((1<< WGM12) | (1))
 	.byte TIMSK1, (1 << OCIE1A)
