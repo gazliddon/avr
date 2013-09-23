@@ -1,9 +1,10 @@
+
 module VCDVal where
 
-data VCDVal = Command String String
-            | TimeScale Int 
-            | Var   { vrBits :: Int,  vrSymbol :: String, vrName :: String }
-            | Event { evTime :: Int,  evMask :: Int,      evSymbol :: String }
+data VCDVal = Command !String !String
+            | TimeScale !Int 
+            | Var   { vrBits :: !Int,  vrSymbol :: !String, vrName :: !String }
+            | Event { evTime :: !Int,  evMask :: !Int,      evSymbol :: !String }
             | Eof deriving (Eq, Show)
 
 isCommand Command{} = True

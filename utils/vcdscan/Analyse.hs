@@ -20,7 +20,7 @@ findEventsByVarName name xs = retFunc (findVars name xs)
 findTogglesDuration name mask xs = map (\(a,b) -> (duration a b) -1 ) $ toPairs . findToggles name mask $ xs
 
 findToggles name mask xs  = dropWhile ((==) 0 . (.&.) mask . evMask)
-                          $ removeRuns (\a b -> evMask a .&. mask == evMask b .&. mask ) 
+                          $ removeRuns (\a b -> (evMask a) .&. mask == (evMask b) .&. mask ) 
                           $ findEventsByVarName name xs 
 
 -- Test Code
@@ -28,7 +28,7 @@ findToggles name mask xs  = dropWhile ((==) 0 . (.&.) mask . evMask)
 hSyncDurations xs = findTogglesDuration "mem_PORTB" 1
 vSyncDurations xs = findTogglesDuration "mem_PORTB" 2
 
-testAnalyse xs = unlines . map show  $ findTogglesDuration "mem_PORTB" 1 xs
+testAnalyse xs = unlines . map show  $ findTogglesDuration "mem_PORTB" 2 xs
 
 -- Test Code
 
@@ -44,7 +44,7 @@ removeRuns f xs = recur xs
     recur [] = []
     recur [a] = [a]
     recur (a:b:abs)
-      | f a b = a : recur abs 
+      | f a b = recur (b:abs) 
       | otherwise = a : recur (b : abs)
 
 -- TODO
