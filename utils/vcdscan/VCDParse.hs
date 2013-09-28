@@ -34,8 +34,10 @@ mainParse = [ parseVar,
               parseEvent,
               parseUnimplemented ]
 
+toChoice a =  choice $ map try a
+
 getCommands source = case parse (many $ toChoice mainParse) "VCD" source of
-  Left err -> error $ "ERROR"
+  Left err -> error "ERROR"
   Right val -> val
 
 
