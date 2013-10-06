@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Analyse2 where
+module Analyse where
 
 import Control.Applicative 
 import Data.Bits
@@ -26,13 +26,6 @@ findTogglesDuration name mask  = map (\(a,b) -> mkPulse a b ) . toPairs . findTo
 -- Test Code
 hSyncDurations = findTogglesDuration "mem_PORTB" 1
 vSyncDurations = findTogglesDuration "mem_PORTB" 2
-
-atest = do
-  txt <- B.readFile "test.vcd"
-  let vfile = parseVCDFIle txt
-  let hs = vSyncDurations (vfEvents vfile) 
-  print hs
-  putStrLn "All done"
 
 -- TODO : move to utils
 toPairs [] = []

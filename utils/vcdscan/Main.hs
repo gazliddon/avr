@@ -6,7 +6,7 @@ import Data.Bits
 import Data.List
 import Text.Printf
 
-import Analyse2
+import Analyse
 import AttoParser
 import qualified Data.ByteString as B
 

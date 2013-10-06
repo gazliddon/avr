@@ -85,8 +85,3 @@ parseVCDFIle text = case parseOnly vcdFileParser text of
   Left err -> error "Error!"
   Right val -> val 
 
--- Test code
-test = do
-  B.readFile "test.vcd" >>= print . parseOnly vcdFileParser
-  putStrLn "All done"
-
