@@ -70,8 +70,8 @@ eventParser = do
 -- Complete file parse
 vcdFileParser :: Parser VFile
 vcdFileParser = do
-  vars <- filter isVar <$> (many $ varParser <|> unknownParser)
-  rawEvents <- many $ eventParser
+  vars <- filter isVar <$> many  (varParser <|> unknownParser)
+  rawEvents <- many eventParser
 
   let varMap = Map.fromList $ map (\(Var id sym) -> (id, Var id sym)) vars
   let getSymbol i = vSymbol $ fromJust $ Map.lookup i varMap 
