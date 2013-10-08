@@ -7,9 +7,9 @@ freq: 20000000
 
 trace:
     - mem_PORTB
-    - mem_PORTC
     - mem_PORTD
-    - mem_TCNT0
+#    - mem_TCNT0
+#    - mem_PORTC
 
 vcdFile: avr.vcd
 vcdPeriod: 1

@@ -43,6 +43,8 @@ hSyncInit:
 
 start = 50
 t0start = 0
+framesToRun = 5
+
 	ldi 	r16,lo8(start)
 	ldi 	r17,hi8(start)
 	ldi 	r18,t0start 
@@ -52,11 +54,12 @@ t0start = 0
 
 	sei
 
-	;; Do ten lines
-1: 	out PORTC, r1
-	out PORTC, r0
+	;; Do two frames
+	ldi r17, framesToRun
+1: 	;; out PORTC, r1
+	;; out PORTC, r0
 	lds 	r16, frameEnd
-	cp 	r16,r2
+	cp 	r16,r17
 	brne 	1b
 	cli
 
@@ -132,41 +135,44 @@ hSyncISR:
 
 
 bmap_init:
-	ldi 	r16,1
+	ldi 	r16,0xff
 	out 	PORTD,r16
+	ldi  	r20,1
 	ret
 
 bmap:	
-	ldi 	r16,2
-	out 	PORTD,r16
+	ldi 	r16,0xff
+	out 	PORTD,r20
+	add    r20,r1
 	ret
 
 front_porch:
-	ldi 	r16,4
-	out     PORTD,R16
 	ret
 
 vsync_start:
-	ldi 	r16,5
-	out 	PORTD,r16
 	sts 	syncVals, r2
 	ret
 
 vsync_end:
-	ldi 	r16, 6
-	out 	PORTD,r16
 	sts 	syncVals, r0
 	ret
 
 blank:
-	ldi 	r16,7
-	out 	PORTD,r16
+	ret
+
+inky:
+	ldi 	r16,90
+1:	out 	PORTD, r16
+	dec 	r16
+	brne 	1b
+	out PORTD, r0
 	ret
 
 test_copper_list:
 	line 	bmap_init,1
 	line 	bmap,251
-	line 	bmap,229
+	line 	bmap,129
+	line    inky,100
 	line 	front_porch,10
 	line 	vsync_start,1
 	line 	blank,1
