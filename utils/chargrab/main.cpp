@@ -72,6 +72,7 @@ static std::string makeLabel(std::string const & _name, int _align)
 }
 
 int main(int argc, char** argv){
+
   using namespace std;
   assert(argc == 3);
   string inFile(argv[1]);
