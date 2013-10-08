@@ -5,7 +5,6 @@ EXE = $(BUILD_DIR)/grabchar
 SOURCE := 	$(wildcard *.cpp)
 INCLUDES := 	$(wildcard *.h)  
 
-
 TMP_DIR := 	$(BUILD_DIR)/tmp
 OBJ_DIR := 	$(BUILD_DIR)/objs
 ALL_DIRS := 	$(OBJ_DIR) $(TMP_DIR)
@@ -15,7 +14,6 @@ LNK := 	 	@g++
 
 OBJ_FILES := 	$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOURCE)))$(TEMP))) 
 
-
 all : $(ALL_DIRS) $(EXE)
 	@echo All Built
 
@@ -24,7 +22,7 @@ clean :
 	@echo cleaned
 
 test : all
-	$(EXE)
+	$(EXE) bb.bmp a
 
 $(OBJ_FILES) : Makefile $(INCLUDES)
 

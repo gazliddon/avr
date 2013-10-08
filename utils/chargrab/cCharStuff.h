@@ -15,37 +15,52 @@
 
 class cChar
 {
-public:
-	cChar(void);
-	bool operator==(cChar const & _rhs) const;
-	void grab(SDL_Surface const & _s, unsigned int _x, unsigned int _y);
+  private:
+    static int const WIDTH = 8;
+    static int const HEIGHT = 8;
+    std::vector<uint8_t>  mPixels;
 
-private:
-	static int const WIDTH = 8;
-	static int const HEIGHT = 8;
-	std::array<uint32_t, WIDTH * HEIGHT>  mPixels;
+  public:
+    cChar(void);
+    bool operator==(cChar const & _rhs) const;
+    void grab(SDL_Surface const & _s, unsigned int _x, unsigned int _y);
+    void dump(void) const;
+
+    std::vector<uint8_t> const & getPixels(void) const; 
 };
+
 
 class cCharSet
 {
-public:
+  public:
+    unsigned int addChar(cChar const & _char);
+    unsigned int numOfChars(void) const;
+    cChar const & getChar(unsigned int _i) const;
 
-	unsigned int addChar(cChar const & _char);
-	private:
-		std::vector<cChar> mChars;
+    std::vector<cChar> const & getChars() const;
+
+  private:
+    std::vector<cChar> mChars;
 };
 
 class cScreen
 {
-	public:
-		cScreen(SDL_Surface const & _s);
-	private:
-		static unsigned int const WIDTH = 256;
-		static unsigned int const HEIGHT = 224;
-		static unsigned int const CWIDTH = 8;
-		static unsigned int const CHEIGHT = 8;
+  public:
+    cScreen(SDL_Surface const & _s);
+    cCharSet const & charSet(void) const; 
 
-		std::array<uint8_t, WIDTH * HEIGHT> mScreen;
-		cCharSet mCharSet;
+  private:
+    static unsigned int const WIDTH = 256;
+    static unsigned int const HEIGHT = 224;
+    static unsigned int const CWIDTH = 8;
+    static unsigned int const CHEIGHT = 8;
+    static unsigned int const WCHARS = WIDTH/CWIDTH;
+    static unsigned int const HCHARS = HEIGHT/CHEIGHT;
+
+    std::array<uint8_t, WCHARS * HCHARS> mScreen;
+    cCharSet mCharSet;
+
+    void set(unsigned int _x, unsigned int _y, uint8_t _c);
+
 };
 
