@@ -48,7 +48,7 @@ class cScreen
   public:
     cScreen(SDL_Surface const & _s);
     cCharSet const & charSet(void) const; 
-
+    std::vector<uint8_t> const & getScr(void) const;
   private:
     static unsigned int const WIDTH = 256;
     static unsigned int const HEIGHT = 224;
@@ -57,7 +57,7 @@ class cScreen
     static unsigned int const WCHARS = WIDTH/CWIDTH;
     static unsigned int const HCHARS = HEIGHT/CHEIGHT;
 
-    std::array<uint8_t, WCHARS * HCHARS> mScreen;
+    std::vector<uint8_t> mScreen;
     cCharSet mCharSet;
 
     void set(unsigned int _x, unsigned int _y, uint8_t _c);

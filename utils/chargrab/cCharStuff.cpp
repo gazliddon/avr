@@ -94,8 +94,10 @@ std::vector<cChar> const & cCharSet::getChars() const {
 cScreen::cScreen(SDL_Surface const & _s) {
   using namespace std;
 
-  int wInChars = WIDTH / CWIDTH;
-  int hInChars = HEIGHT / CHEIGHT;
+  int wInChars = WCHARS;
+  int hInChars = HCHARS;
+  
+  mScreen.resize(WCHARS * HCHARS);
 
   cChar thisChar;
 
@@ -118,5 +120,9 @@ cCharSet const & cScreen::charSet(void) const {
   return mCharSet;
 }
 
+std::vector<uint8_t> const & cScreen::getScr(void) const {
+  return mScreen;
+}
+  
 // ----------------------------------------------------------------------------
 // ends

@@ -10,6 +10,8 @@
 #include <assert.h>
 #include <string>
 #include <sstream>
+#include <fstream>
+
 template<class T>
 std::string printBytes(T const & _src)
 {
@@ -32,7 +34,7 @@ std::string printBytes(T const & _src)
   return out.str();
 }
 
-std::string makeAsm(std::string const & _label, int _align, std::vector<uint8_t> const & _src)
+static std::string makeAsm(std::string const & _label, int _align, std::vector<uint8_t> const & _src)
 {
   using namespace std;
 
@@ -44,7 +46,8 @@ std::string makeAsm(std::string const & _label, int _align, std::vector<uint8_t>
   return out.str();
 }
 
-std::ostream & operator<<(std::ostream & _out, cCharSet const & _rhs)
+template<class STR>
+STR & operator<<(STR & _out, cCharSet const & _rhs)
 {
   using namespace std;
   auto const & chrs = _rhs.getChars();
@@ -54,43 +57,43 @@ std::ostream & operator<<(std::ostream & _out, cCharSet const & _rhs)
   return _out;
 }
 
-class cLabel
+template<class STR>
+STR & operator<<(STR & _out, std::vector<uint8_t> const & _table) {
+  _out << printBytes(_table) << std::endl;
+  return _out;
+}
+
+static std::string makeLabel(std::string const & _name, int _align)
 {
-  public:
-    cLabel(std::string const & _name, int _align = 1) : mAlign(_align), mLabel(_name) {}
-
-    std::ostream & operator << (std::ostream & _out) {
-      using namespace std;
-      _out << "\t.global\t" << mLabel << endl << mLabel << ":" << endl << "\t.align " << mAlign;
-      return _out;
-    }
-
-  private:
-    std::string         mLabel;
-    int                 mAlign;
-};
-
-
-std::vector<uint8_t> test = {1,2,3,4,5,6,7,8,99,10,11,11,12};
+  using namespace std;
+  stringstream out;
+  out << "\t.global\t" << _name << endl << _name << ":" << endl << "\t.align " << _align << endl;
+  return out.str();
+}
 
 int main(int argc, char** argv){
   using namespace std;
   assert(argc == 3);
-  auto inFile = argv[1];
-  auto outFile = argv[2];
+  string inFile(argv[1]);
+  string outFile(argv[2]);
 
   auto sdlInit =SDL_Init(SDL_INIT_EVERYTHING); 
   assert (sdlInit == 0);
 
-  SDL_Surface *bmp = SDL_LoadBMP( inFile );
+  SDL_Surface *bmp = SDL_LoadBMP( inFile.c_str() );
   assert(bmp != nullptr);
 
   cScreen myScr(*bmp);
 
-  SDL_Quit();
-  string  x = makeAsm("hello", 8, test);
+  ofstream outStream(outFile, ofstream::trunc);
+  assert(outStream);
 
-  cout << x << endl;
+  outStream << makeLabel("characters", 8) << myScr.charSet();
+  outStream << makeLabel("screen", 8) << myScr.getScr();
+  outStream.close();
+
+  SDL_Quit();
 
   return 0;
 }
+
