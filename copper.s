@@ -97,47 +97,56 @@ jump_routine:
 	ijmp                            ; 2
 
 
+;; New copper
+
+;; r6:r7 -> copper routine
+;; r8 count
+
+;; r26:r27 -> table (once a line? needed?)
+;; r28:r29 -> trashed
+;; r30::r31 -> trashed
 
 ;; X (r26:r27) -> table
 set_copper_list2:
-        ld r7,X+
-        ld r8, X+
         ld r6, X+
+        ld r7, X+
+        ld r8, X+
 	ret
 
-;; r6 = count
-;; r7:r8 -> copper routine
-;; 17 cycles from call line routine begins
-;; can take 3 off of that by inlining
-;; so 24 cycles for line routine before sending pixels
+;; r8 = count
+;; r6:r7 -> copper list
+;; 14 cycles from call line routine begins
+
+X = 26
+XL = X
+XH = 27
+Y = 28
+YL = Y
+YH = 29
+Z = 30
+ZL = Z
+ZH = 31
 
 copper_next2:
-        dec     r6                              ; 1 (4)
-        brne    1f                              ; 1/2 (5/6)
+        dec     r8                              ; 0 (1) 
+        brne    1f                              ; 1 (1/2)
 
-           mov   r26,r7                         ; 1 (7)
-           mov   r27,r8                         ; 1 (8)
-           adiw  r26,3                          ; 1 (9)
-           mov   r26,r7                         ; 1 (11)
-           mov   r27,r8                         ; 1 (12)
-           ld    r30,X+                         ; 2 (13)
-           ld    r31,X+                         ; 2 (15)
-           ld    r6,X+                          ; 2 (17)
-           ijmp                                 ; 2 (19)
+        movw  X,r6                           ; 1 (2)
+        adiw  X,3                            ; 1 (3)
+        movw  r6,X                           ; 1 (4)
+        ld    YL,X+                          ; 2 (5)
+        ld    YH,X+                          ; 2 (7)
+        ld    r6,X+                          ; 2 (9)
+        ijmp                                 ; 2 (11)
 
-1:      ;; enter @ cycle 6
-        mov     r30,r7                          ; 1 (7)
-        mov      r31,r8                         ; 1 (8)
-
+1:      ;; enter @ cycle 3
+        movw     Y,r6                           ; 1 (3)
+        nop                                     ; 1 (4)
+        nop                                     ; 1 (5)
+        nop                                     ; 1 (6)
+        nop                                     ; 1 (7)
+        nop                                     ; 1 (8)
         nop                                     ; 1 (9)
         nop                                     ; 1 (10)
-        nop                                     ; 1 (11)
-        nop                                     ; 1 (12)
-        nop                                     ; 1 (13)
-        nop                                     ; 1 (14)
-        nop                                     ; 1 (15)
-        nop                                     ; 1 (16)
-        nop                                     ; 1 (17)
-
-	ijmp                                    ; 2 (19)
+	ijmp                                    ; 2 (11)
 

@@ -1,4 +1,5 @@
-	.global	characters
+	.section .text
+        .global	characters
 characters:
 	.align 8
 

@@ -6,7 +6,7 @@ FREQ := 20000000
 
 AVR_SIM := 	../simavr/simavr/run_avr 
 
-SOURCE := 	$(wildcard *.s)
+SOURCE := 	$(wildcard *.s) $(wildcard *.c)
 INCLUDES := 	$(wildcard *.i)  
 
 BUILD_DIR :=	build
@@ -26,12 +26,14 @@ OBJ_FILES := 	$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOU
 TRACE_INFO := 	$(UTILS_DIR)/traceinfo/dist/build/traceinfo/traceinfo
 VCD_SCAN :=    $(UTILS_DIR)/vcdscan/dist/build/vcdscan/vcdscan
 
-OBJ_FILES :=  	$(OBJ_FILES) $(OBJ_DIR)/trace.o  
+OBJ_FILES :=  	$(COBJ_FILES) $(OBJ_FILES) $(OBJ_DIR)/trace.o  
 
 all : $(ALL_DIRS) $(DEBUG_FILE)
 	@echo All done
 
-COMP :=  @avr-gcc -nostdlib -g -c -mmcu=$(TYPE) 
+COMP :=  @avr-gcc -nostdlib -g -c -mmcu=$(TYPE)
+ASM_COMP :=  @avr-gcc -O2 -nostdlib -g -S -mmcu=$(TYPE)
+
 LNK := 	 @avr-gcc -Xlinker -Tdata -Xlinker 0x800100 -nostdlib 
 
 # Directories
@@ -49,6 +51,12 @@ $(OBJ_FILES) : Makefile $(INCLUDES)
 # Compile asm -> o
 $(OBJ_DIR)/%.o : %.s
 	@echo Compiling $<
+	$(COMP) -o $@ $<
+
+# Compile asm -> o
+$(OBJ_DIR)/%.o : %.c
+	@echo Compiling $<
+	$(ASM_COMP) -o t.asm $<
 	$(COMP) -o $@ $<
 
 # yaml -> compiled source
