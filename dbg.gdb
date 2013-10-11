@@ -7,7 +7,9 @@ layout next
 layout next
 
 con
-b copper_jump
+b hSyncInit
+b printScreenKernelInit
+b printScreenLineKernel
 c
 
 

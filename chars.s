@@ -28,13 +28,23 @@ MAX_CHARS = 128
 
 ;; Presistent
 Y_PIXEL =     15
+
 SCR_LINE =    20
-SRAM_CHARS =  22
-FLASH_CHARS = 24
+SCR_LINE_L =  20
+SCR_LINE_H =  21
+
+SRAM_CHARS =   22
+SRAM_CHARS_L = 22
+SRAM_CHARS_H = 23
+
+FLASH_CHARS =   24
+FLASH_CHARS_L = 24
+FLASH_CHARS_H = 25
 
 ;; Transient / trashed
 T_64 =        12
 LT_0 =        10
+T_CHAR_ADD =  11
 
 ;; Reg >= 16 temp
 T_CHAR_WIDTH = 16
@@ -45,15 +55,15 @@ T_3 = 19
 printScreenKernelInit:
 	clr Y_PIXEL
 
-	ldi T_2, lo8(ramScreen)
-	ldi T_3, hi8(ramScreen)
-	movw SCR_LINE, T_2
+	ldi SCR_LINE_L,   lo8(ramScreen)
+	ldi SCR_LINE_H, hi8(ramScreen)
 
-	ldi SRAM_CHARS, lo8(characters)
-	ldi SRAM_CHARS, hi8(characters)
+	ldi SRAM_CHARS_L, lo8(characters)
+	ldi SRAM_CHARS_H, hi8(characters)
 
-	ldi FLASH_CHARS, lo8(characters)
-	ldi FLASH_CHARS, hi8(characters)
+	ldi FLASH_CHARS_L, lo8(characters)
+	ldi FLASH_CHARS_H, hi8(characters)
+
 	ret
 
 ; Needed to generate on entry to printer
@@ -62,10 +72,10 @@ printScreenKernelInit:
 
 printScreenLineKernel:
 	;; Calc first char address
-	movw 	Z, SCR_LINE 			; 0  (1)
+	movw 	X, SCR_LINE 			; 0  (1)
 	ldi 	T_1,64 				; 1  (1)
 	mov 	T_64, T_1 			; 2  (1)
-	lpm 	T_1, Z+ 			; 3  (3)
+	ld 	T_1, X+ 			; 3  (3)
 	mul 	T_1,T_64 			; 6  (2)
 	movw 	Z,FLASH_CHARS 			; 8  (1)
 	cpi 	T_1,MAX_CHARS 			; 9  (1)
@@ -74,8 +84,17 @@ printScreenLineKernel:
 
 	add 	ZL, r0 				; 12 (1)
 	adc 	ZH, r1 				; 13 (1)
-	ldi 	T_CHAR_WIDTH,5 		; 14 (1)
-	;; ->  
+	ldi 	T_CHAR_WIDTH,7 		; 14 (1)
+
+	mov 	T_1, Y_PIXEL
+	andi 	T_1, 7
+	lsl 	T_1
+	lsl 	T_1
+	lsl 	T_1
+	add 	ZL,T_1
+	adc 	ZH,0
+
+	;; -> 
 
 renderFromFlash:
         ;; p0
@@ -117,16 +136,9 @@ renderFromFlash:
         out PORTD, LT_0
                 brne renderFromFlash  ;; 2 if take 
 
-	inc 	Y_PIXEL         ;; Inc yPos
-	mov 	T_1,Y_PIXEL  	;; if we went to next line bump screen address (r20) up
-	andi 	T_1, 0x7
-	brne 	1f
-	movw 	SCR_LINE, X
 	inc 	r1
-	ret
+	inc 	Y_PIXEL         ;; Inc yPos
 
-1:      nop
-	inc r1
 	ret
 
 lineBufferKernelInit:

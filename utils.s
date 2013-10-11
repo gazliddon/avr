@@ -12,25 +12,26 @@
 ;; Copy a chunk for FLASH to SRAM
 ;; Z -> src
 ;; Y -> dst
-;; r16:r17 lentgth
-;; trashes r18:19
-cp_flash_to_sram:
-        movw    r18,Z
-        add     r18,r16         ;; r18:19 -> last address
-        adc     r19,r17
+;; r16:r17 length
 
-        ;; Check to see if we're at last addrees
-        ;; do it at the start, might have been passed zero :)
-1:
-        cp      r18,ZL
-        cpc     r19,ZH
+cp_flash_to_sram:
+        push r3
+        cp      r16,r0          ;; Not copying zero bytes
+        cpc     r17,r0
         breq    2f
 
-        lpm     r16, Z+
-        st      Y+,r16
-        rjmp     1b
+        add     r16,ZL
+        adc     r17,ZH
 
-2:      ret
+1:
+        lpm     r3, Z+
+        st      Y+,r3
+        cp      ZL, r16
+        cpc     ZH, r17
+        brne    1b
+
+2:      pop r3
+        ret
 
 ;; -------------------------------------------------------------------------------
 ;; Copy from PM to ram

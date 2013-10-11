@@ -45,6 +45,18 @@ start = 50
 t0start = 0
 framesToRun = 2
 
+charsToCopy = 10*10
+
+        ldi     ZL,lo8(screen)
+        ldi     ZH,hi8(screen)
+        
+        ldi     YL,lo8(ramScreen)
+        ldi     YH,hi8(ramScreen)
+        
+        ldi     r16,lo8(charsToCopy)
+        ldi     r17,hi8(charsToCopy)
+        rcall   cp_flash_to_sram
+
 	ldi 	r16,lo8(start)
 	ldi 	r17,hi8(start)
 	ldi 	r18,t0start 
