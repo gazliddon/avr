@@ -86,14 +86,6 @@ printScreenLineKernel:
 	adc 	ZH, r1 				; 13 (1)
 	ldi 	T_CHAR_WIDTH,7 		; 14 (1)
 
-	mov 	T_1, Y_PIXEL
-	andi 	T_1, 7
-	lsl 	T_1
-	lsl 	T_1
-	lsl 	T_1
-	add 	ZL,T_1
-	adc 	ZH,0
-
 	;; -> 
 
 renderFromFlash:
@@ -138,6 +130,24 @@ renderFromFlash:
 
 	inc 	r1
 	inc 	Y_PIXEL         ;; Inc yPos
+
+	mov 	T_1, Y_PIXEL
+	andi 	T_1, 7
+	cpi 	T_1, 0
+	brne 	1f
+	
+	ldi SRAM_CHARS_L, lo8(characters)
+	ldi SRAM_CHARS_H, hi8(characters)
+	ldi FLASH_CHARS_L, lo8(characters)
+	ldi FLASH_CHARS_H, hi8(characters)
+	ret
+
+1: 	ldi 	T_1,8
+	add 	SRAM_CHARS_L,T_1
+	adc 	SRAM_CHARS_H,r0
+
+	add 	FLASH_CHARS_L,T_1
+	adc 	FLASH_CHARS_H,r0
 
 	ret
 
