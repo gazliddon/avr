@@ -56,6 +56,7 @@ void cChar::grab(SDL_Surface const & _s, unsigned int _x, unsigned int _y) {
     for(int x = 0 ; x <WIDTH; x++){
       uint32_t p = mkCol(ptr[0], ptr[1],ptr[2]);
       mPixels[x+y*WIDTH] = p;
+      ptr+=3;
     }
   }
 }

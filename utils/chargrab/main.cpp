@@ -40,8 +40,8 @@ static std::string makeAsm(std::string const & _label, int _align, std::vector<u
 
   stringstream out;
   out << "\t.global\t" << _label << endl;
-  out <<  _label << ":" << endl;
   out <<  "\t.align\t" << _align  << endl;
+  out <<  _label << ":" << endl;
   out << printBytes(_src);
   return out.str();
 }
@@ -67,7 +67,9 @@ static std::string makeLabel(std::string const & _name, int _align)
 {
   using namespace std;
   stringstream out;
-  out << "\t.global\t" << _name << endl << _name << ":" << endl << "\t.align " << _align << endl;
+  out << "\t.global\t" << _name << endl;
+  out << "\t.align " << _align << endl;
+  out << _name << ":" << endl;
   return out.str();
 }
 
@@ -89,6 +91,7 @@ int main(int argc, char** argv){
   ofstream outStream(outFile, ofstream::trunc);
   assert(outStream);
 
+  outStream << "\t.section\t.text\n";
   outStream << makeLabel("characters", 8) << myScr.charSet();
   outStream << makeLabel("screen", 8) << myScr.getScr();
   outStream.close();
