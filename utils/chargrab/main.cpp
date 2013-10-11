@@ -40,8 +40,8 @@ static std::string makeAsm(std::string const & _label, int _align, std::vector<u
 
   stringstream out;
   out << "\t.global\t" << _label << endl;
-  out <<  "\t.align\t" << _align  << endl;
   out <<  _label << ":" << endl;
+  out <<  "\t.align\t" << _align  << endl;
   out << printBytes(_src);
   return out.str();
 }
