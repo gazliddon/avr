@@ -30,12 +30,12 @@ makeFrame evs = Frame { frLines = myLines, frMaxLineWidth = maxLineDuration }
 
 getDims frm = (frMaxLineWidth frm, length . frLines $ frm)
 
-toPixel px = map (* 64) [r,g,b]
+toPixel px = map (\a -> quot a 1) [r,g,b]
   where
     p = (pxCol px)
-    r = p .&. 3
-    g = (quot p 8 ) .&. 3
-    b = (quot p 64) .&. 3
+    r = (p .&. 3) * 0x40 
+    g = ((quot p 4 ) .&. 3) * 0x40
+    b = ((quot p 16) .&. 3) * 0x40
 
 -- Convert stream of events into an array of pixels
 emit [] _ _ = [] 
