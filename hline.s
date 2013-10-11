@@ -43,7 +43,7 @@ hSyncInit:
 
 start = 50
 t0start = 0
-framesToRun = 5
+framesToRun = 2
 
 	ldi 	r16,lo8(start)
 	ldi 	r17,hi8(start)
@@ -73,8 +73,13 @@ hSyncISR:
 	push 	r16
 	in 	r16, SREG
 	push 	r16
-	push 	r27
 	push 	r26
+	push 	r27
+        push    r28
+        push    r29
+        push    r30
+        push    r31
+
 
 	ldi 	r27, 0 				; Remove interrupt latency jitter (align to 20mhz clock & 7) 
 	ldi 	r26, TCNT1L
@@ -122,8 +127,13 @@ hSyncISR:
 	icall
 	
 	pop 	r17
-	pop 	r26
+
+	pop 	r31
+	pop 	r30
+	pop 	r29
+	pop 	r28
 	pop 	r27
+	pop 	r26
 	pop 	r16
 	out 	SREG, r16
 	pop 	r16
@@ -172,7 +182,10 @@ test_copper_list:
 	line 	bmap_init,1
 	line 	bmap,251
 	line 	bmap,129
-	line    inky,100
+	line    inky,50
+        line    printScreenKernelInit,1
+        line    printScreenLineKernel,49
+
 	line 	front_porch,10
 	line 	vsync_start,1
 	line 	blank,1

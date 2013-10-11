@@ -1,44 +1,15 @@
 
 	.include 	"ports.i"
-
+	.include 	"avr.i"
 ;; ----------------------------------------------------------------------------
 ;; Globals
-        .global fillLineBuffer
-
-
-
-
-;; ----------------------------------------------------------------------------
-;; Should be in some global include file
-
-X = 26
-XL = X
-XH = 27
-
-Y = 28
-YL = Y
-YH = 29
-
-Z = 30
-ZL = Z
-ZH = 31
-
-;; Bit positions of flags in SREG
-I_FLAG = 7
-T_FLAG = 6
-H_FLAG = 5
-S_FLAG = 4
-V_FLAG = 3
-N_FLAG = 2
-Z_FLAG = 1
-C_FLAG = 0
-
+	.global 	printScreenKernelInit
+	.global 	printScreenLineKernel
 
 ;; ----------------------------------------------------------------------------
 ;; Equates
 WIDTH_CHARS =     16
 WIDTH_PIXELS =    WIDTH_CHARS * 8
-
 
 ;; ----------------------------------------------------------------------------
 ;; Vars
@@ -51,29 +22,19 @@ WIDTH_PIXELS =    WIDTH_CHARS * 8
 ;; Code
         .section 	.text
 
-
 MAX_CHARS = 128
-
-; Persistent
-; r13 = ypixel  
-; r20:21 -> scr line
-; r22:23 -> sram chars
-; r24:25 -> flash chars
-
 
 ;; Register Allocations
 
 ;; Presistent
-Y_PIXEL = 13
-SCR_LINE = 20
-SRAM_CHARS = 22
+Y_PIXEL =     15
+SCR_LINE =    20
+SRAM_CHARS =  22
 FLASH_CHARS = 24
 
 ;; Transient / trashed
-T_64 = 12
-
-;; Reg < 16 temp
-LT_0 = 10
+T_64 =        12
+LT_0 =        10
 
 ;; Reg >= 16 temp
 T_CHAR_WIDTH = 16
@@ -103,19 +64,18 @@ printScreenLineKernel:
 	;; Calc first char address
 	movw 	Z, SCR_LINE 			; 0  (1)
 	ldi 	T_1,64 				; 1  (1)
-	mov 	T_64, T_1
-	lpm 	T_1, Z+ 			; 2  (3)
-	mul 	T_1,T_64 			; 5  (2)
-	movw 	Z,FLASH_CHARS 			; 7  (1)
-	cpi 	T_1,MAX_CHARS 			; 8  (1)
-	brsh    .+2
+	mov 	T_64, T_1 			; 2  (1)
+	lpm 	T_1, Z+ 			; 3  (3)
+	mul 	T_1,T_64 			; 6  (2)
+	movw 	Z,FLASH_CHARS 			; 8  (1)
+	cpi 	T_1,MAX_CHARS 			; 9  (1)
+	brsh    .+2 				; 10 (2/1)
 	movw 	Z,SRAM_CHARS 			; 10 (1)
 
-	add 	ZL, r0 				; 11 (1)
-	adc 	ZH, r1 				; 12 (1)
-	ldi 	T_CHAR_WIDTH,10 				; 15 (1)
+	add 	ZL, r0 				; 12 (1)
+	adc 	ZH, r1 				; 13 (1)
+	ldi 	T_CHAR_WIDTH,5 		; 14 (1)
 	;; ->  
-
 
 renderFromFlash:
         ;; p0

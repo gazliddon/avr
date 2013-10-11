@@ -6,8 +6,33 @@
 	.global 	r012
 	.global 	portCMark
 	.global 	cp_pmem_to_mem
+        .global         cp_flash_to_sram
 
+;; -------------------------------------------------------------------------------
+;; Copy a chunk for FLASH to SRAM
+;; Z -> src
+;; Y -> dst
+;; r16:r17 lentgth
+;; trashes r18:19
+cp_flash_to_sram:
+        movw    r18,Z
+        add     r18,r16         ;; r18:19 -> last address
+        adc     r19,r17
 
+        ;; Check to see if we're at last addrees
+        ;; do it at the start, might have been passed zero :)
+1:
+        cp      r18,ZL
+        cpc     r19,ZH
+        breq    2f
+
+        lpm     r16, Z+
+        st      Y+,r16
+        rjmp     1b
+
+2:      ret
+
+;; -------------------------------------------------------------------------------
 ;; Copy from PM to ram
 ;; Z -> src
 ;; Y -> dst

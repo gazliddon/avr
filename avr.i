@@ -46,4 +46,26 @@ OCIE1A = 1
 
 
 
+X = 26
+XL = X
+XH = 27
+
+Y = 28
+YL = Y
+YH = 29
+
+Z = 30
+ZL = Z
+ZH = 31
+
+;; Bit positions of flags in SREG
+I_FLAG = 7
+T_FLAG = 6
+H_FLAG = 5
+S_FLAG = 4
+V_FLAG = 3
+N_FLAG = 2
+Z_FLAG = 1
+C_FLAG = 0
+
 
