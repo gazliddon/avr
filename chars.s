@@ -27,11 +27,11 @@ MAX_CHARS = 128
 ;; Register Allocations
 
 ;; Presistent
-Y_PIXEL =     15
 
-SCR_LINE =    20
-SCR_LINE_L =  20
-SCR_LINE_H =  21
+
+Y_POS =      20
+Y_POS_L =    20    ;; b 0 - 4 = fractional b 5 - 7 = offset into char
+Y_POS_H =    21    ;; b 0 - 8 = char line
 
 SRAM_CHARS =   22
 SRAM_CHARS_L = 22
@@ -42,51 +42,93 @@ FLASH_CHARS_L = 24
 FLASH_CHARS_H = 25
 
 ;; Transient / trashed
-T_64 =        12
+T_64 =        9
 LT_0 =        10
-T_CHAR_ADD =  11
+LT_1 = 	      11
+LT_2 = 	      12
+LT_3 = 	      13
+
+Y_ADD =       14
 
 ;; Reg >= 16 temp
 T_CHAR_WIDTH = 16
 T_1 = 17
-T_2 = 18
-T_3 = 19
+
+
+.macro calc_scr
+
+	mov 	T_1, Y_POS_L
+	lsr     T_1
+	lsr     T_1
+	add 	FLASH_CHARS_L, T_1
+	adc 	FLASH_CHARS_H, r0
+	add 	SRAM_CHARS_L, T_1
+	adc 	SRAM_CHARS_H, r0
+	
+	;; Work out scr line Y_POS_H
+	ldi 	T_CHAR_WIDTH, 8 		; 14 (1)
+	mul 	Y_POS_H, T_CHAR_WIDTH
+	ldi 	XL, lo8(screen)
+	ldi 	XH, hi8(screen)
+	add 	XL, r0
+	adc 	XH, r1
+	clr r0
+	clr r1
+	inc r1
+.endm
 
 printScreenKernelInit:
-	clr Y_PIXEL
-
-	ldi SCR_LINE_L,   lo8(ramScreen)
-	ldi SCR_LINE_H, hi8(ramScreen)
+	clr Y_POS_L
+	clr Y_POS_H
 
 	ldi SRAM_CHARS_L, lo8(characters)
 	ldi SRAM_CHARS_H, hi8(characters)
 
 	ldi FLASH_CHARS_L, lo8(characters)
 	ldi FLASH_CHARS_H, hi8(characters)
-
+	
 	ret
 
-; Needed to generate on entry to printer
-; Z -> char
-; X -> scr
-
 printScreenLineKernel:
-	;; Calc first char address
-	movw 	X, SCR_LINE 			; 0  (1)
+	ldi SRAM_CHARS_L, lo8(characters)
+	ldi SRAM_CHARS_H, hi8(characters)
+
+	ldi FLASH_CHARS_L, lo8(characters)
+	ldi FLASH_CHARS_H, hi8(characters)
+	mov 	T_1, Y_POS_L
+
+	lsr     T_1
+	lsr     T_1
+	andi 	T_1, 0b00111000
+
+	add 	FLASH_CHARS_L, T_1
+	adc 	FLASH_CHARS_H, r0
+	add 	SRAM_CHARS_L, T_1
+	adc 	SRAM_CHARS_H, r0
+	
+	;; Work out scr line Y_POS_H
+	ldi 	T_CHAR_WIDTH, 8 		; 14 (1)
+	mul 	Y_POS_H, T_CHAR_WIDTH
+	ldi 	XL, lo8(ramScreen)
+	ldi 	XH, hi8(ramScreen)
+
+;;;	add 	XL, r0
+;;;	adc 	XH, r1
+
+	ldi 	T_CHAR_WIDTH,6 		; 14 (1)
+
 	ldi 	T_1,64 				; 1  (1)
 	mov 	T_64, T_1 			; 2  (1)
 	ld 	T_1, X+ 			; 3  (3)
+	
 	mul 	T_1,T_64 			; 6  (2)
-	movw 	Z,FLASH_CHARS 			; 8  (1)
+	movw 	Z,SRAM_CHARS 			; 8  (1)
 	cpi 	T_1,MAX_CHARS 			; 9  (1)
 	brsh    .+2 				; 10 (2/1)
-	movw 	Z,SRAM_CHARS 			; 10 (1)
+	movw 	Z,FLASH_CHARS 			; 10 (1)
 
 	add 	ZL, r0 				; 12 (1)
 	adc 	ZH, r1 				; 13 (1)
-	ldi 	T_CHAR_WIDTH,7 		; 14 (1)
-
-	;; -> 
 
 renderFromFlash:
         ;; p0
@@ -97,7 +139,7 @@ renderFromFlash:
         lpm LT_0,Z+
         out PORTD, LT_0
                 cpi     T_1, MAX_CHARS
-                movw    T_2, FLASH_CHARS
+                movw    LT_2, FLASH_CHARS
         ;; p2
         lpm LT_0,Z+
         out PORTD, LT_0
@@ -106,49 +148,34 @@ renderFromFlash:
         lpm LT_0,Z+
         out PORTD, LT_0
 		brsh .+2
-                movw    T_2,SRAM_CHARS
+                movw    LT_2,SRAM_CHARS
         ;; p4
         lpm LT_0,Z+
         out PORTD, LT_0
-                add T_2,r0
-                adc T_3,r1
+                add LT_2,r0
+                adc LT_3,r1
         ;; p5
         lpm LT_0,Z+
         out PORTD, LT_0
-		clr r0
-		clr r1
- 
+		nop
+		nop
         ;; p6
         lpm LT_0,Z+
         out PORTD, LT_0
                 dec T_CHAR_WIDTH
         ;; p7
         lpm LT_0,Z+
-		movw Z, T_2
+		movw Z, LT_2
         out PORTD, LT_0
                 brne renderFromFlash  ;; 2 if take 
 
-	inc 	r1
-	inc 	Y_PIXEL         ;; Inc yPos
+	clr r0
+	clr r1
+	inc r1
 
-	mov 	T_1, Y_PIXEL
-	andi 	T_1, 7
-	cpi 	T_1, 0
-	brne 	1f
-	
-	ldi SRAM_CHARS_L, lo8(characters)
-	ldi SRAM_CHARS_H, hi8(characters)
-	ldi FLASH_CHARS_L, lo8(characters)
-	ldi FLASH_CHARS_H, hi8(characters)
-	ret
-
-1: 	ldi 	T_1,8
-	add 	SRAM_CHARS_L,T_1
-	adc 	SRAM_CHARS_H,r0
-
-	add 	FLASH_CHARS_L,T_1
-	adc 	FLASH_CHARS_H,r0
-
+	ldi 	T_1, 1<<3
+	add 	Y_POS_L, T_1
+	adc 	Y_POS_H, r0
 	ret
 
 lineBufferKernelInit:

@@ -1,8 +1,9 @@
 # Avr makfile
 
-PROJECT := avr
-TYPE := atmega88 
-FREQ := 20000000
+PROJECT :=   avr
+TYPE :=      atmega88
+TYPE_SIM :=  atmega88
+FREQ :=      20000000
 
 AVR_SIM := 	../simavr/simavr/run_avr 
 
@@ -26,15 +27,14 @@ OBJ_FILES := 	$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(basename $(notdir $(SOU
 TRACE_INFO := 	$(UTILS_DIR)/traceinfo/dist/build/traceinfo/traceinfo
 VCD_SCAN :=    $(UTILS_DIR)/vcdscan/dist/build/vcdscan/vcdscan
 
+COMP :=  @avr-gcc -nostdlib -g -c -mmcu=$(TYPE)
+ASM_COMP :=  @avr-gcc -O2 -nostdlib -g -S -mmcu=$(TYPE)
+LNK := 	 @avr-gcc -Xlinker -Tdata -Xlinker 0x800100 -nostdlib 
+
 OBJ_FILES :=  	$(COBJ_FILES) $(OBJ_FILES) $(OBJ_DIR)/trace.o  
 
 all : $(ALL_DIRS) $(DEBUG_FILE)
 	@echo All done
-
-COMP :=  @avr-gcc -nostdlib -g -c -mmcu=$(TYPE)
-ASM_COMP :=  @avr-gcc -O2 -nostdlib -g -S -mmcu=$(TYPE)
-
-LNK := 	 @avr-gcc -Xlinker -Tdata -Xlinker 0x800100 -nostdlib 
 
 # Directories
 $(ALL_DIRS) :
@@ -70,20 +70,17 @@ clean:
 	@rm -rf $(BUILD_DIR)
 
 run : all
-	$(AVR_SIM) -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
-	@echo All run!
-
-gdb : all
-	gdb -tui --args $(AVR_SIM) -g -f $(FREQ) -m $(TYPE) $(DEBUG_FILE)
+	$(AVR_SIM) -f $(FREQ) -m $(TYPE_SIM) $(DEBUG_FILE)
 	@echo All run!
 
 # Launch the exe in the sim in the background listening for gdb
 # run gdb and connect to the sim
 # kill avr task - might not be there so ignore error
 debug : all
-	- $(AVR_SIM) -g -f $(FREQ) -m $(TYPE) $(DEBUG_FILE) & > /dev/null
+	- $(AVR_SIM) -g -f $(FREQ) -m $(TYPE_SIM) $(DEBUG_FILE) & > /dev/null
 	avr-gdb -tui $(DEBUG_FILE) -x dbg.gdb
 	-killall avr
  
 analyse: run
 	$(VCD_SCAN) test.vcd
+	convert frm.ppm frm.png
