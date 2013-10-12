@@ -191,12 +191,12 @@ inky:
 	ret
 
 test_copper_list:
-	line 	bmap_init,1
-	line 	bmap,251
-	line 	bmap,129
-	line    inky,50
+	line    inky,1
         line    printScreenKernelInit,1
-        line    printScreenLineKernel,49
+        line    printScreenLineKernel,50
+        line    printScreenLineKernel,149
+        line    printScreenLineKernel,152
+        line    printScreenLineKernel,129
 
 	line 	front_porch,10
 	line 	vsync_start,1
