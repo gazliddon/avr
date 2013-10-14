@@ -30,7 +30,7 @@ pbin a = (showIntAtBase 2 intToDigit a) ""
 pcol = pbin . col2pack
 
 mkAsm (Screen w h scr, ChrSet chars) = unlines $ allStrs where
-  allStrs = [ ".section .data"
+  allStrs = [ ".section .text"
             , globVar 8 "screen"
             , toBytes [w,h]
             , toBytes scr
